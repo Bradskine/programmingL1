@@ -1,0 +1,106 @@
+<!doctype html>
+
+<head>
+
+    <title>game</title>
+</head>
+
+
+<body>
+    <canvas id="gameCanvas" width="800" height="800"></canvas>
+    <script>
+        var canvas, canvasContext;
+
+
+        //player variables
+        var playersize = 70;
+        var playerXpos = 350;
+        var playerYpos = 700;
+        var playerYspeed = -12;
+        var gravityStrength = 20;
+
+        const SPACEBAR = 32;
+
+        var  SpaceBarPressed = false;
+
+        //        var StartingPos = true;
+        //So when game first starts player goes to starting posistion
+
+
+        window.onload = function() {
+            canvas = document.getElementById('gameCanvas');
+            canvasContext = canvas.getContext('2d');
+
+            setInterval(mainloop, 1000 / 50);
+
+            document.addEventListener('keydown', keyPressed);
+            document.addEventListener('keyup', keyReleased);
+
+        } //endo of onload
+
+
+        function mainloop() {
+            colorRect(0, 0, canvas.width, canvas.height, 'black');
+            playerMove();
+            drawPlayer();
+//            gravity();
+            //            if (StartingPos = true) {
+            //                startpos();
+            //                StartingPos = false;  
+            //                console.log('testing')
+            //            } 
+
+        } //End of main loop;
+
+
+
+        function drawPlayer() { // to draw player
+            colorRect(playerXpos, playerYpos, playersize, playersize, "red")
+        }
+
+
+//        function gravity() { //so player always drops down if not on floor.
+//            if (playerYpos < 700 && SpaceBarPressed == false) {
+//                playerYpos += gravityStrength;
+//            }
+//        }
+
+
+
+
+
+        function keyPressed(evt) { //checks for keys pressed
+            if (evt.keyCode == SPACEBAR) {
+                SpaceBarPressed = true;
+                console.log('pressed')
+            }
+
+        }
+
+        function keyReleased(evt) { //check for keys released
+            if (evt.keyCode == SPACEBAR) {
+                SpaceBarPressed = false;
+                console.log('released')
+            }
+
+        }
+
+
+
+        function playerMove() { //makes player move when space pressed
+            if (SpaceBarPressed == true) {
+                playerYpos += playerYspeed;
+                console.log('Spacebar')
+            }
+        }
+
+
+
+        function colorRect(x, y, w, h, c) { // to draw things parameters are xpos ,ypos ,width ,height and ,color.
+            canvasContext.fillStyle = c;
+            canvasContext.fillRect(x, y, w, h);
+        }
+
+    </script>
+
+</body>

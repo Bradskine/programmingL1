@@ -10,108 +10,108 @@
     <canvas id="gameCanvas" width="800" height="800"></canvas>
     <script>
         var canvas, canvasContext;
-
-
         //player variables
         var playersize = 70;
         var playerXpos = 350;
         var playerYpos = 700;
-        var playerYspeed = 20;
-        var gravityStrength = -32;
+        //playerSpeed vars
         var playerStartSpeed = 20;
-
+        var playerYspeed = 0;
+        var playerMaxSpeed = 12;
+        var playerAcceleration = 0.5;
+        var playerReset = 0;
+        // grabity vars
+        var gravityStrength =  0;
+        var gravityReset = -20;
+        var gravityChangeSpeed = 2;
+        var gravityMaxSpeed = 20;
         //constants and vars for keys
         const SPACEBAR = 32;
         var SpaceBarPressed = false;
-
-
-
-
-
         //        var StartingPos = true;
         //So when game first starts player goes to starting posistion
-
-
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
-
             setInterval(mainloop, 1000 / 50);
-
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
-
         } //endo of onload
-
-
         function mainloop() {
             colorRect(0, 0, canvas.width, canvas.height, 'black');
-            playerMove();
             drawPlayer();
-            gravity();
+            playerMove();
             //            if (StartingPos = true) {
             //                startpos();
             //                StartingPos = false;  
             //                console.log('testing')
             //            } 
-
             if (playerYpos > 700) { // so player keeps going to right spot if gos below after delay
                 playerYpos = 700;
             }
-
         } //End of main loop;
-
-
-
+        
         function drawPlayer() { // to draw player
             colorRect(playerXpos, playerYpos, playersize, playersize, "red")
         }
+        
+        
+        
+        function playerMove() { //makes player move when space pressed
+            if (SpaceBarPressed == true) {
+                gravityStrength = gravityReset; // To reset gravity when space pressed
+                
+                
+                if (playerYspeed < playerMaxSpeed) {
+                    playerYspeed += playerAcceleration;
+                }
+                playerYpos -= playerYspeed;
 
-
+            } else {
+                playerYspeed = playerReset;
+                gravity(); //activates gravity
+            }
+        }
+        
+        
         function gravity() { //so player always drops down if not on floor.
             if (playerYpos < 700 && SpaceBarPressed == false) {
-
-                playerYpos -= gravityStrength;   
+                gravityReleased();
+                playerYpos += gravityStrength;   
             }
-
-        } //end of grabity function
-
-
-
-
+        } //end of gravity function 
+        
+        
+        
+        function gravityReleased() {` `
+            if(gravityStrength < gravityMaxSpeed)  {
+                gravityStrength = gravityStrength + gravityChangeSpeed;   
+            }
+        } //this function is for when spacebar is first released
+        
+        
+        
+        
+        
         function keyPressed(evt) { //checks for keys pressed
             if (evt.keyCode == SPACEBAR) {
                 SpaceBarPressed = true;
                 //                console.log('pressed')
             }
-
         }
-
+        
         function keyReleased(evt) { //check for keys released
             if (evt.keyCode == SPACEBAR) {
                 SpaceBarPressed = false;
                 //                console.log('released')
             }
-
         }
-
-
-
-        function playerMove() { //makes player move when space pressed
-            if (SpaceBarPressed == true) {
-                playerYspeed = playerStartSpeed;
-                playerYpos -= playerYspeed;
-                //                console.log('Spacebar')
-            }
-        }
-
-
-
+        
         function colorRect(x, y, w, h, c) { // to draw things parameters are xpos ,ypos ,width ,height and ,color.
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
-
+        
     </script>
 
 </body>

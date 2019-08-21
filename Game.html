@@ -19,11 +19,11 @@
         var playerYspeed = 0;
         var playerMaxSpeed = 12;
         var playerAcceleration = 0.5;
-        var playerReset = 0;
-        // grabity vars
+        var playerSpeedReset = 0;
+        // grabity vars 
         var gravityStrength =  0;
         var gravityReset = -20;
-        var gravityChangeSpeed = 2;
+        var gravityChangeSpeed = 1.3;
         var gravityMaxSpeed = 20;
         //constants and vars for keys
         const SPACEBAR = 32;
@@ -68,7 +68,7 @@
                 playerYpos -= playerYspeed;
 
             } else {
-                playerYspeed = playerReset;
+                playerYspeed = playerSpeedReset;
                 gravity(); //activates gravity
             }
         }

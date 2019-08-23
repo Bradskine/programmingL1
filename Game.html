@@ -23,8 +23,8 @@
         // grabity vars 
         var gravityStrength =  0;
         var gravityReset = -20;
-        var gravityChangeSpeed = 1.3;
-        var gravityMaxSpeed = 20;
+        var gravityChangeSpeed = 2.3;
+        var gravityMaxSpeed = -20;
         //constants and vars for keys
         const SPACEBAR = 32;
         var SpaceBarPressed = false;
@@ -68,26 +68,24 @@
                 playerYpos -= playerYspeed;
 
             } else {
-                playerYspeed = playerSpeedReset;
-                gravity(); //activates gravity
+            
+                if (playerYspeed > gravityMaxSpeed) {
+                playerYspeed += gravityChangeSpeed;
+            }
+                playerYpos += playerYspeed;
             }
         }
         
         
-        function gravity() { //so player always drops down if not on floor.
-            if (playerYpos < 700 && SpaceBarPressed == false) {
-                gravityReleased();
-                playerYpos += gravityStrength;   
-            }
-        } //end of gravity function 
+       //end of gravity function 
         
         
         
-        function gravityReleased() {` `
-            if(gravityStrength < gravityMaxSpeed)  {
-                gravityStrength = gravityStrength + gravityChangeSpeed;   
-            }
-        } //this function is for when spacebar is first released
+//        function gravityReleased() {` `
+//            if(gravityStrength < gravityMaxSpeed)  {
+//                gravityStrength = gravityStrength + gravityChangeSpeed;   
+//            }
+//        } //this function is for when spacebar is first released
         
         
         

@@ -11,81 +11,121 @@
     <script>
         var canvas, canvasContext;
         //player variables
-        var playersize = 70;
-        var playerXpos = 350;
+        var playerWidth = 70;
+        var playerHeight = 70;
+        var playerXpos = 160;
         var playerYpos = 700;
         //playerSpeed vars
-        var playerStartSpeed = 20;
         var playerYspeed = 0;
-        var playerMaxSpeed = 12;
-        var playerAcceleration = 0.5;
-        var playerSpeedReset = 0;
+        var playerMaxSpeed = -10;
+        var playerAcceleration = -0.9;
         // grabity vars 
         var gravityStrength =  0;
-        var gravityReset = -20;
-        var gravityChangeSpeed = 2.3;
-        var gravityMaxSpeed = -20;
+        var gravityChangeSpeed = 0.7;
+        var gravityMaxSpeed = 10;
+        //Obstacle vars
+        //lasers
+        var lasers = [];
+        var laserCount = 1;
+        
         //constants and vars for keys
         const SPACEBAR = 32;
         var SpaceBarPressed = false;
-        //        var StartingPos = true;
-        //So when game first starts player goes to starting posistion
+
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
             setInterval(mainloop, 1000 / 50);
+            
+            for(var i = 0; i<laserCount; i++) {
+             lasers.push(randLaser());
+            }
+            
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
+        
+        
+        
+        
         function mainloop() {
             colorRect(0, 0, canvas.width, canvas.height, 'black');
             drawPlayer();
             playerMove();
-            //            if (StartingPos = true) {
-            //                startpos();
-            //                StartingPos = false;  
-            //                console.log('testing')
-            //            } 
-            if (playerYpos > 700) { // so player keeps going to right spot if gos below after delay
-                playerYpos = 700;
-            }
+            drawLasers();
+            laserMove();
+            
+                if (playerYpos  > 700) { // so player keeps going to right spot if gos below after delay
+                    playerYpos = 700;
+                }
+            
         } //End of main loop;
         
-        function drawPlayer() { // to draw player
-            colorRect(playerXpos, playerYpos, playersize, playersize, "red")
-        }
         
-        
+         function laserMove() {
+             lasers.forEach(function(brick, index, array) {
+
+    
+           });
+      } 
         
         function playerMove() { //makes player move when space pressed
-            if (SpaceBarPressed == true) {
-                gravityStrength = gravityReset; // To reset gravity when space pressed
-                
-                
-                if (playerYspeed < playerMaxSpeed) {
-                    playerYspeed += playerAcceleration;
-                }
-                playerYpos -= playerYspeed;
-
-            } else {
+    
+            if(playerYpos == 700) { // if player on roof restes speed as not moving
+                playerYspeed = 0;
+            }
             
-                if (playerYspeed > gravityMaxSpeed) {
-                playerYspeed += gravityChangeSpeed;
+             if(playerYpos < 50) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
+                playerYpos = 50;
+                playerYspeed = 0;
             }
-                playerYpos += playerYspeed;
+            
+                if (SpaceBarPressed == true) {  //acceleration going up
+
+                    if (playerYspeed > playerMaxSpeed) {
+                        playerYspeed += playerAcceleration;
+                    }
+
+                            //these change playerYspeed (above and below)
+                } else {
+                    if (playerYspeed < gravityMaxSpeed && playerYpos < 700 ) {
+                    playerYspeed += gravityChangeSpeed; //acceleration going down
+                    }              
+                }
+            playerYpos += playerYspeed; //makes player move
+            
+        }
+        
+        function drawLasers() { // draws the lasers
+            lasers.forEach(function(lasers, index, array) {
+                colorRect(lasers.laserXpos, lasers.laserYpos, lasers.laserWidth, lasers.laserHeight, 'red');
+            });
+        }
+
+        
+        function randLaser() {   //randomizes laser width and position also creates variables for lasers
+            var laserWidth = 200;
+            var laserHeight = 30;
+            var laserXpos = canvas.width -30;  //make out side right of page later
+            var laserYpos = Math.floor(Math.random() * (canvas.height - laserHeight));
+            var laserXspeed = -3;
+            
+            var newLaserObject = {
+                laserWidth: laserWidth,
+                laserXpos: laserXpos,  //need to change making not move
+                laserYpos: laserYpos,
+                laserHeight: laserHeight,
+                laserXspeed: laserXspeed
             }
+
+            return newLaserObject; //returns new laser vars for new lasers
         }
         
         
-       //end of gravity function 
         
-        
-        
-//        function gravityReleased() {` `
-//            if(gravityStrength < gravityMaxSpeed)  {
-//                gravityStrength = gravityStrength + gravityChangeSpeed;   
-//            }
-//        } //this function is for when spacebar is first released
+        function drawPlayer() { // to draw player
+            colorRect(playerXpos, playerYpos, playerWidth, playerHeight, "green")
+        }
         
         
         
@@ -109,6 +149,7 @@
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
+        
         
     </script>
 

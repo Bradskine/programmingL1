@@ -7,14 +7,16 @@
 
 
 <body>
-    <canvas id="gameCanvas" width="800" height="800"></canvas>
+    <canvas id="gameCanvas" width="800" height="700"></canvas>
     <script>
         var canvas, canvasContext;
         //player variables
         var playerWidth = 70;
         var playerHeight = 70;
         var playerXpos = 160;
-        var playerYpos = 700;
+        var playerYpos = 600;
+        var floor = 600;
+        var ceiling = 50;
         //playerSpeed vars
         var playerYspeed = 0;
         var playerMaxSpeed = -10;
@@ -40,6 +42,7 @@
 
             for (var i = laserCount; i < laserMaxCount; i++) {
                 lasers.push(randLaser());
+
             }
 
             document.addEventListener('keydown', keyPressed);
@@ -61,16 +64,16 @@
 
 
         function playerMove() { //makes player move when space pressed
-            if (playerYpos > 700) { // so player keeps going to right spot if gos below after delay
-                playerYpos = 700;
+            if (playerYpos > floor) { // so player keeps going to right spot if gos below after delay
+                playerYpos = floor;
             }
 
-            if (playerYpos == 700) { // if player on roof restes speed as not moving
+            if (playerYpos == floor) { // if player on roof resets speed as not moving
                 playerYspeed = 0;
             }
 
-            if (playerYpos < 50) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
-                playerYpos = 50;
+            if (playerYpos < ceiling) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
+                playerYpos = ceiling ;
                 playerYspeed = 0;
             }
 
@@ -79,16 +82,18 @@
                 if (playerYspeed > playerMaxSpeed) {
                     playerYspeed += playerAcceleration;
                 }
-
+ 
                 //these change playerYspeed (above and below)
             } else {
-                if (playerYspeed < gravityMaxSpeed && playerYpos < 700) {
+                if (playerYspeed < gravityMaxSpeed && playerYpos < floor) {
                     playerYspeed += gravityChangeSpeed; //acceleration going down
                 }
-            }
+            } 
+            
+            if(playerYpos <= floor && playerYpos >= ceiling)
             playerYpos += playerYspeed; //makes player move
 
-        }
+        } //end of playerMove function
 
         function drawLasers() { // draws the lasers
             lasers.forEach(function(laser, index, array) {
@@ -101,20 +106,24 @@
             lasers.forEach(function(laser, index, array) {
                 laser.laserXpos += laser.laserXspeed;
                 if (laser.laserXpos + laser.laserWidth <= 0) {
-                        
+                    delete laser.laserXpos;
+                    laserCount -= 1;
                 }
+                 if(laserCount < laserMaxCount) {
+                        lasers.push(randLaser());
+                  }
             });
         }
 
         function randLaser() { //randomizes laser width and position also creates variables for lasers
             var laserWidth = 200;
             var laserHeight = 30;
-            var laserXpos = canvas.width - 30; //make out side right of page later
-            var laserYpos = Math.floor(Math.random() * (canvas.height - laserHeight));
+            var laserXpos = canvas.width; //make out side right of page later
+            var laserYpos = Math.floor(Math.random() * (floor - laserHeight));
             var laserXspeed = -3;
 
             var newLaserObject = {
-                laserWidth: laserWidth,
+                laserWidth: laserWidth, 
                 laserXpos: laserXpos, //need to change making not move
                 laserYpos: laserYpos,
                 laserHeight: laserHeight,
@@ -122,6 +131,7 @@
             }
 
             laserCount += 1;
+            
             return newLaserObject; //returns new laser vars for new lasers
         }
 
@@ -130,9 +140,6 @@
         function drawPlayer() { // to draw player
             colorRect(playerXpos, playerYpos, playerWidth, playerHeight, "green")
         }
-
-
-
 
 
         function keyPressed(evt) { //checks for keys pressed

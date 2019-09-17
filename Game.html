@@ -19,66 +19,71 @@
         var ceiling = 50;
         //playerSpeed vars
         var playerYspeed = 0;
-        var playerMaxSpeed = -10;
-        var playerAcceleration = -0.9;
+        var playerMaxSpeed = -8;
+        var playerAcceleration = -0.5 ;
         // grabity vars 
         var gravityStrength = 0;
-        var gravityChangeSpeed = 0.7;
-        var gravityMaxSpeed = 10;
+        var gravityChangeSpeed = 0.5;
+        var gravityMaxSpeed = 8;
         //Obstacle vars
-        //lasers
+        //lasers  
         var lasers = [];
         var laserCount = 0;
-        var laserMaxCount = 2;
-
+        var laserMaxCount = 1;
+        var minGap = 0;
+        var maxGap = 500;
         //constants and vars for keys
         const SPACEBAR = 32;
         var SpaceBarPressed = false;
-
+        var score = 0;
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
             setInterval(mainloop, 1000 / 50);
-
             for (var i = laserCount; i < laserMaxCount; i++) {
                 lasers.push(randLaser());
-
             }
-
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
-
-
-
-
+      
+     
+        
         function mainloop() {
+            score += 1;
             colorRect(0, 0, canvas.width, canvas.height, 'black');
             drawPlayer();
             playerMove();
             drawLasers();
             laserMove();
-
-
+            drawScore();
         } //End of main loop;
-
-
+        
+        
+        
+        
+        function drawScore() {
+            canvasContext.font = "16px Arial";
+            canvasContext.fillStyle = "red";
+            canvasContext.fillText("Score: "+score, 8, 20);
+        }
+        
+        
+        
         function playerMove() { //makes player move when space pressed
             if (playerYpos > floor) { // so player keeps going to right spot if gos below after delay
                 playerYpos = floor;
             }
-
             if (playerYpos == floor) { // if player on roof resets speed as not moving
                 playerYspeed = 0;
             }
-
             if (playerYpos < ceiling) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
                 playerYpos = ceiling ;
                 playerYspeed = 0;
             }
-
+            
+            
             if (SpaceBarPressed == true) { //acceleration going up
-
                 if (playerYspeed > playerMaxSpeed) {
                     playerYspeed += playerAcceleration;
                 }
@@ -92,36 +97,37 @@
             
             if(playerYpos <= floor && playerYpos >= ceiling)
             playerYpos += playerYspeed; //makes player move
-
+      
+        
         } //end of playerMove function
-
         function drawLasers() { // draws the lasers
             lasers.forEach(function(laser, index, array) {
                 colorRect(laser.laserXpos, laser.laserYpos, laser.laserWidth, laser.laserHeight, 'red');
             });
         }
-
-
         function laserMove() {
             lasers.forEach(function(laser, index, array) {
                 laser.laserXpos += laser.laserXspeed;
                 if (laser.laserXpos + laser.laserWidth <= 0) {
-                    delete laser.laserXpos;
+                    delete laser.laserXpos; //deletes current xpos to reset
                     laserCount -= 1;
                 }
                  if(laserCount < laserMaxCount) {
                         lasers.push(randLaser());
                   }
+                
+                if(laser.laserXpos <= playerXpos+playerWidth && laser.laserXpos > playerXpos) }//
+                
+                
             });
-        }
-
+        } //lasermove end
         function randLaser() { //randomizes laser width and position also creates variables for lasers
+            
             var laserWidth = 200;
             var laserHeight = 30;
-            var laserXpos = canvas.width; //make out side right of page later
-            var laserYpos = Math.floor(Math.random() * (floor - laserHeight));
+            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap))//makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later
+            var laserYpos = Math.floor(Math.random() * (floor - ceiling) + ceiling);
             var laserXspeed = -3;
-
             var newLaserObject = {
                 laserWidth: laserWidth, 
                 laserXpos: laserXpos, //need to change making not move
@@ -129,38 +135,30 @@
                 laserHeight: laserHeight,
                 laserXspeed: laserXspeed
             }
-
-            laserCount += 1;
             
+            laserCount += 1;
             return newLaserObject; //returns new laser vars for new lasers
         }
-
-
-
         function drawPlayer() { // to draw player
             colorRect(playerXpos, playerYpos, playerWidth, playerHeight, "green")
         }
-
-
         function keyPressed(evt) { //checks for keys pressed
             if (evt.keyCode == SPACEBAR) {
                 SpaceBarPressed = true;
                 //                console.log('pressed')
             }
         }
-
         function keyReleased(evt) { //check for keys released
             if (evt.keyCode == SPACEBAR) {
                 SpaceBarPressed = false;
                 //                console.log('released')
             }
         }
-
         function colorRect(x, y, w, h, c) { // to draw things parameters are xpos ,ypos ,width ,height and ,color.
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
-
+           
     </script>
 
 </body>

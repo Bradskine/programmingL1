@@ -34,8 +34,9 @@
         var maxGap = 500;
         //constants and vars for keys
         const SPACEBAR = 32;
+        const UPARROW = 38;
         var SpaceBarPressed = false;
-        var score = 0;
+        var score = 1;
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
@@ -117,24 +118,35 @@
                     lasers.push(randLaser());
                 }
 
-                if (laser.laserXpos <= (playerXpos +               playerWidth) &&
+                if (laser.laserXpos <= (playerXpos + playerWidth - 4) &&
                     (laser.laserXpos + laser.laserWidth) >
                     playerXpos //Xpos detection
 
-                    && playerYpos >= laser.laserYpos
-                    && playerYpos <= (laser.laserYpos + laser.laserHeight)) { //Ypos detection only top of player
+                    &&
+                    (playerYpos + playerHeight) > laser.laserYpos &&
+                    playerYpos + 16 <= (laser.laserYpos + laser.laserHeight)) { //Ypos detection only top of player
                     gameOver();
                 }
 
             });
         } //lasermove end of function
         function randLaser() { //randomizes laser width and position also creates variables for lasers
-
+            if (score <= 1000) {
+                var laserXspeed = -3;
+            } else if (score <= 2000) { //to make dificulty change  
+                laserXspeed = -6;
+            } else if (score <= 2500) {
+                laserXspeed = -15;
+            } else {
+                if (laserMaxCount = 1) {
+                    laserMaxCount += 1;
+                    laserXspeed = -5
+                }
+            }
             var laserWidth = 200;
             var laserHeight = 30;
             var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap)) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later
             var laserYpos = Math.floor(Math.random() * (floor - ceiling) + ceiling);
-            var laserXspeed = -3;
             var newLaserObject = {
                 laserWidth: laserWidth,
                 laserXpos: laserXpos, //need to change making not move
@@ -152,14 +164,14 @@
         }
 
         function keyPressed(evt) { //checks for keys pressed
-            if (evt.keyCode == SPACEBAR) {
+            if (evt.keyCode == SPACEBAR || evt.keyCode == UPARROW) {
                 SpaceBarPressed = true;
                 //                console.log('pressed')
             }
         }
 
         function keyReleased(evt) { //check for keys relea sed
-            if (evt.keyCode == SPACEBAR) {
+            if (evt.keyCode == SPACEBAR || evt.keyCode == UPARROW) {
                 SpaceBarPressed = false;
                 //                console.log('released')
             }
@@ -171,8 +183,8 @@
         }
 
         function gameOver() {
-    
-           alert('game over')
+
+            alert('game over')
         }
 
     </script>

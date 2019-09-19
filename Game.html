@@ -1,3 +1,4 @@
+  
 <!doctype html>
 
 <head>
@@ -47,10 +48,7 @@
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
-
-
-
-        function mainloop() {
+        function mainloop() {      
             score += 1;
             colorRect(0, 0, canvas.width, canvas.height, 'black');
             drawPlayer();
@@ -59,18 +57,11 @@
             laserMove();
             drawScore();
         } //End of main loop;
-
-
-
-
         function drawScore() {
             canvasContext.font = "26px Arial";
             canvasContext.fillStyle = "red";
             canvasContext.fillText("Score: " + score, 15, 30);
         }
-
-
-
         function playerMove() { //makes player move when space pressed
             if (playerYpos > floor) { // so player keeps going to right spot if gos below after delay
                 playerYpos = floor;
@@ -82,31 +73,24 @@
                 playerYpos = ceiling;
                 playerYspeed = 0;
             }
-
-
             if (SpaceBarPressed == true) { //acceleration going up
                 if (playerYspeed > playerMaxSpeed) {
                     playerYspeed += playerAcceleration;
                 }
-
                 //these change playerYspeed (above and below)
             } else {
                 if (playerYspeed < gravityMaxSpeed && playerYpos < floor) {
                     playerYspeed += gravityChangeSpeed; //acceleration going down
                 }
             }
-
             if (playerYpos <= floor && playerYpos >= ceiling)
                 playerYpos += playerYspeed; //makes player move
-
-
         } //end of playerMove function
         function drawLasers() { // draws the lasers
             lasers.forEach(function(laser, index, array) {
                 colorRect(laser.laserXpos, laser.laserYpos, laser.laserWidth, laser.laserHeight, 'red');
             });
         }
-
         function laserMove() {
             lasers.forEach(function(laser, index, array) {
                 laser.laserXpos += laser.laserXspeed;
@@ -117,17 +101,14 @@
                 if (laserCount < laserMaxCount) {
                     lasers.push(randLaser());
                 }
-
                 if (laser.laserXpos <= (playerXpos + playerWidth - 4) &&
                     (laser.laserXpos + laser.laserWidth) >
                     playerXpos //Xpos detection
-
                     &&
                     (playerYpos + playerHeight) > laser.laserYpos &&
                     playerYpos + 16 <= (laser.laserYpos + laser.laserHeight)) { //Ypos detection only top of player
                     gameOver();
                 }
-
             });
         } //lasermove end of function
         function randLaser() { //randomizes laser width and position also creates variables for lasers
@@ -143,9 +124,13 @@
                     laserXspeed = -5
                 }
             }
+            
+            
+            
             var laserWidth = 200;
-            var laserHeight = 30;
-            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap)) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later
+            var laserHeight = 30;                                       
+            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap)) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later         
+                                                        //max  -  min       + min
             var laserYpos = Math.floor(Math.random() * (floor - ceiling) + ceiling);
             var newLaserObject = {
                 laserWidth: laserWidth,
@@ -154,39 +139,32 @@
                 laserHeight: laserHeight,
                 laserXspeed: laserXspeed
             }
-
             laserCount += 1;
             return newLaserObject; //returns new laser vars for new lasers
         }
-
         function drawPlayer() { // to draw player
             colorRect(playerXpos, playerYpos, playerWidth, playerHeight, "green")
         }
-
         function keyPressed(evt) { //checks for keys pressed
             if (evt.keyCode == SPACEBAR || evt.keyCode == UPARROW) {
                 SpaceBarPressed = true;
                 //                console.log('pressed')
             }
         }
-
         function keyReleased(evt) { //check for keys relea sed
             if (evt.keyCode == SPACEBAR || evt.keyCode == UPARROW) {
                 SpaceBarPressed = false;
                 //                console.log('released')
             }
         }
-
         function colorRect(x, y, w, h, c) { // to draw things parameters are xpos ,ypos ,width ,height and ,color.
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
-
         function gameOver() {
-
-            alert('game over')
+            alert('game over');
+            delete playerXpos;
         }
-
     </script>
 
-</body>
+</body>      

@@ -1,4 +1,3 @@
-  
 <!doctype html>
 
 <head>
@@ -125,13 +124,23 @@
                 }
             }
             
+            if (Math.random() < 0.5) {
+                var laserShape = 1;  // 1 is horizontal
+            } else {
+                var laserShape = 2;  // 2 is verticle
+                console.log('testing')
+            }
             
-            
+            if (laserShape == 1) {
             var laserWidth = 200;
-            var laserHeight = 30;                                       
+            var laserHeight = 30; 
+            } else{
+                var laserWidth = 30;
+                var laserHeight = 200;
+            }
             var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap)) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later         
-                                                        //max  -  min       + min
-            var laserYpos = Math.floor(Math.random() * (floor - ceiling) + ceiling);
+                                                     //max  -  min       + min
+            var laserYpos = Math.floor(Math.random() * ((floor + playerHeight) - ceiling)       + ceiling);
             var newLaserObject = {
                 laserWidth: laserWidth,
                 laserXpos: laserXpos, //need to change making not move
@@ -167,4 +176,4 @@
         }
     </script>
 
-</body>      
+</body>     

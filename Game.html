@@ -32,11 +32,15 @@
         var laserMaxCount = 1;
         var minGap = 0;
         var maxGap = 500;
-        //constants and vars for keys
+        //constants and vars for keys 
         const SPACEBAR = 32;
         const UPARROW = 38;
         var SpaceBarPressed = false;
         var score = 1;
+        
+        var gameOverScreen = new Image();
+        gameOverScreen.src = 'img/GameOver.png'
+        
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
@@ -55,6 +59,7 @@
             drawLasers();
             laserMove();
             drawScore();
+
         } //End of main loop;
         function drawScore() {
             canvasContext.font = "26px Arial";
@@ -112,15 +117,16 @@
         } //lasermove end of function
         function randLaser() { //randomizes laser width and position also creates variables for lasers
             if (score <= 1000) {
-                var laserXspeed = -3;
-            } else if (score <= 2000) { //to make dificulty change  
-                laserXspeed = -6;
+                var laserXspeed = -5;
+            } else if (score <= 2000 && laserMaxCount < 2) { //to make dificulty change  
+                laserXspeed = -5;
+                laserMaxCount += 1;
             } else if (score <= 2500) {
-                laserXspeed = -15;
+                laserXspeed = -7;
             } else {
                 if (laserMaxCount = 1) {
                     laserMaxCount += 1;
-                    laserXspeed = -5
+                    laserXspeed = -10
                 }
             }
             
@@ -170,9 +176,12 @@
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
+        
+        function drawImg(src,x,y,w,h){
+            canvasContext.drawImage(src,x,y,w,h);
+        }
         function gameOver() {
-            alert('game over');
-            delete playerXpos;
+            drawImg(gameOverScreen,0,0,canvas.width,canvas.height);
         }
     </script>
 

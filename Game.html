@@ -37,10 +37,20 @@
         const UPARROW = 38;
         var SpaceBarPressed = false;
         var score = 1;
-
+        //PowerUP
+        var powerUps = [];
         var gameOverScreen = new Image();
+        var gameFinished = false;
+        var name = prompt("What's your name")
+        while (name.length == 0 || name == 'null') {
+            alert("Your name must be more than one character");
+            name = prompt("What's your name?");
+        }
+        alert("Hi " + name + "Hope you enjoy my game");
+        var difficulty prompt("What difficulty do you want to play at, Easy, Medium or Hard") 
+        while(difficulty !== )
+        
         gameOverScreen.src = 'img/GameOver.jpg'
-
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
@@ -51,29 +61,64 @@
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
-        function mainloop() {    
-            score += 1;
+        function mainloop() {
             colorRect(0, 0, canvas.width, canvas.height, 'black');
             drawPlayer();
             playerMove();
             drawLasers();
             laserMove();
             drawScore();
-            randPowerUp();
+            drawPowerUp();
+            powerUpMove();
         } //End of main loop;
-        
-        function randPowerUp() {
-            if (score = 1000) {
-                colorRect(30, 50, 500, 500, 'green')  
+        function randPowerUp() { // makes random power up 
+            if (score <= 1000) {
+                var puXspeed = -5;
+            } else if (score <= 2000 && laserMaxCount < 2) { //to make dificulty change  
+                puXspeed = -5;
+            } else if (score <= 2500) {
+                puXspeed = -7;
+            } else {
+                puXspeed = -10
             }
+            var puWidth = 50;
+            var puHeight = 50;
+            var puXpos = canvas.width
+            var puYpos = Math.floor(Math.random() * ((floor + playerHeight) - ceiling) + ceiling);
+            var puXspeed = puXspeed;
+            var newPowerUpObject = {
+                puWidth: puWidth,
+                puXpos: puXpos, //need to change making not move
+                puYpos: puYpos,
+                puHeight: puHeight,
+                puXspeed: puXspeed
+            }
+            return newPowerUpObject; //end of rand power up
         }
-        
+        function drawPowerUp() { // draws the lasers
+            powerUps.forEach(function(powerUP, index, array) {
+                colorRect(powerUP.puXpos, powerUP.puYpos, powerUP.puWidth, powerUP.puHeight, 'blue');
+            });
+        }
+        function powerUpMove() {
+            powerUps.forEach(function(powerUp, index, array) {
+                powerUp.puXpos += powerUp.puXspeed;
+            });
+        }
         function drawScore() {
             canvasContext.font = "26px Arial";
             canvasContext.fillStyle = "red";
             canvasContext.fillText("Score: " + score, 15, 30);
+            if (gameFinished == false) {
+                score += 1;
+            }
+            if (score == 1000) {
+                powerUps.push(randPowerUp());
+            }
+            if (score == 2000) {
+                powerUps.push(randPowerUp());
+            }
         }
-
         function playerMove() { //makes player move when space pressed
             if (playerYpos > floor) { // so player keeps going to right spot if gos below after delay
                 playerYpos = floor;
@@ -103,7 +148,6 @@
                 colorRect(laser.laserXpos, laser.laserYpos, laser.laserWidth, laser.laserHeight, 'red');
             });
         }
-
         function laserMove() {
             lasers.forEach(function(laser, index, array) {
                 laser.laserXpos += laser.laserXspeed;
@@ -132,20 +176,17 @@
                 laserMaxCount += 1;
             } else if (score <= 2500) {
                 laserXspeed = -7;
-            } else { 
+            } else {
                 if (laserMaxCount = 1) {
                     laserMaxCount += 1;
                     laserXspeed = -10
-                } 
+                }
             }
-
             if (Math.random() < 0.5) {
                 var laserShape = 1; // 1 is horizontal
             } else {
                 var laserShape = 2; // 2 is verticle
-                console.log('testing')
             }
-
             if (laserShape == 1) {
                 var laserWidth = 200;
                 var laserHeight = 30;
@@ -166,39 +207,33 @@
             laserCount += 1;
             return newLaserObject; //returns new laser vars for new lasers
         }
-
         function drawPlayer() { // to draw player
             colorRect(playerXpos, playerYpos, playerWidth, playerHeight, "green")
         }
-
         function keyPressed(evt) { //checks for keys pressed
             if (evt.keyCode == SPACEBAR || evt.keyCode == UPARROW) {
                 SpaceBarPressed = true;
                 //                console.log('pressed')
             }
         }
-
         function keyReleased(evt) { //check for keys relea sed
             if (evt.keyCode == SPACEBAR || evt.keyCode == UPARROW) {
                 SpaceBarPressed = false;
                 //                console.log('released')
             }
         }
-
         function colorRect(x, y, w, h, c) { // to draw things parameters are xpos ,ypos ,width ,height and ,color.
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
-
         function drawImg(src, x, y, w, h) {
             canvasContext.drawImage(src, x, y, w, h);
         }
-
         function gameOver() {
             drawImg(gameOverScreen, 0, 0, canvas.width, canvas.height);
-            }
-        
-
+            alert('your score is ' + score)
+            gameFinished = true;
+        }
     </script>
 
-</body>
+</body>     

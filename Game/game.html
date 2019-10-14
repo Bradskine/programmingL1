@@ -207,15 +207,35 @@
                 if (laserCount < laserMaxCount) {
                     lasers.push(randLaser());
                 }
-                if (laser.laserXpos <= (playerXpos + playerWidth - 4) &&
-                    (laser.laserXpos + laser.laserWidth) >
-                    playerXpos //Xpos detection
-                    &&
-                    (playerYpos + playerHeight) > laser.laserYpos &&
-                    playerYpos + 16 <= (laser.laserYpos + laser.laserHeight)) { //Ypos detection only top of player
-                    gameOver();
+                if (laser.laserYpos + laser.laserHeight < playerYpos ||
+                    laser.laserYpos > playerYpos + playerHeight      ||
+                    laser.laserXpos + laser.laserWidth < playerXpos  ||
+                    laser.laserXpos > playerXpos + playerWidth) {
+                    //checked if any of sides are not touching player
+                } else {
+                    if(powerUpActive == true) {
+                        powerUpActive = false;  
+                    }  else {       //bugged
+                        gameOver();
+                        console.log('something');
+                    }
+               
                 }
             });
+            
+            
+            
+            // old code for colission
+//            if (laser.laserXpos <= (playerXpos + playerWidth - 4) &&
+////                    (laser.laserXpos + laser.laserWidth) >
+////                    playerXpos //Xpos detection
+////                    &&
+////                    (playerYpos + playerHeight) > laser.laserYpos &&
+////                    playerYpos + 16 <= (laser.laserYpos + laser.laserHeight))
+            
+            
+            
+            
         } //lasermove end of function
         function randLaser() { //randomizes laser width and position also creates variables for lasers
             

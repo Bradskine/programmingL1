@@ -7,7 +7,7 @@
 
 
 <body>
-    <canvas id="gameCanvas" width="800" height="600" ></canvas>
+    <canvas id="gameCanvas" width="800" height="700" ></canvas>
  
     <style>
        canvas { /* center canvas*/
@@ -47,15 +47,14 @@
         var laserXspeed = 0;
         var minGap = 0;
         var maxGap = 500;
-        //enimies
-        var enimie = [];
-        var enimieCount = 0;
-        var laserMaxCount = 1;
-        var laserXspeed=0;
+        //scientist
+        var scientist = [];
+        var siCount = 0;
+        var siMaxCount = 2;
         //gun
         var bullets = [];
         var bulletCount = 0;
-        var bulletMaxCount = 4;
+        var bulletMaxCount = 6;
             
         
         //constants and vars for keys 
@@ -95,6 +94,9 @@
             for (var i = laserCount; i < laserMaxCount; i++) {
                 lasers.push(randLaser());
             }
+            for (var i = siCount; i < siMaxCount; i++) {
+                scientist.push(addScientist());
+            }
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
@@ -109,9 +111,48 @@
             powerUpMove();
             drawBullets();
             bulletMove();
+            drawScientist();
+            scientistMove();
         } //End of main loop;
         
+        function drawScientist() { // draws the scientist
+            scientist.forEach(function(si, index, array) {
+                colorRect(si.siXpos,si.siYpos ,si.siWidth ,si.siHeight ,si.siColor );
+            });
+        }
+        function scientistMove() {
+            scientist.forEach(function(si, index, array) {
+                
+                si.siXpos += si.siXspeed;
+                if (si.siXpos + si.siWidth <= 0) {
+                    delete si.siXpos; //deletes current xpos to reset on other side
+                    siCount -= 1;
+                }
+                
+//                if (siCount < siMaxCount) {
+//                    scientist.push(addScientist()); //makes new scientist if less than max count which is based on difficulty and score
+//                }      
+            });
+        }
         
+        function addScientist() { 
+            var siXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap));
+            var siHeight = 50;
+            var siWidth = 25;
+            var siYpos = floor;
+            var siXspeed = laserXspeed - 2;
+            var siColour = 'white';
+            var newScientist = {
+                siXpos: siXpos,
+                siHeight: siHeight, //need to change making not move
+                siWidth: siWidth,
+                siYpos: siYpos,
+                siXspeed: siXspeed,
+                siColor: siColour
+            }
+            siCount += 1;
+            return newScientist; //returns new laser vars for new lasers   
+        }
         
         function drawBullets() {
             bullets.forEach(function(bullet, index, array) {
@@ -137,14 +178,14 @@
             return newBulletObject;
         }
         
-        function bulletMove() {
-              if(spaceBarPressed == true && bulletCount < 4) {
-                bullets.push(addBullet());
-            }     
+        
+        
+        function bulletMove() {  
             bullets.forEach(function(bullet, index, array) {
               bullet.bulletXpos += bullet.bulletSpeed;
                 
              if(bullet.bulletXpos > canvas.width) {
+                 delete(bullet.bulletXpos);
                 bulletCount -=1;
              }
         });
@@ -301,20 +342,30 @@
             if (difficulty.toLowerCase() == 'easy') {
                 if (score <= 500) {
                     laserXspeed = -3;
-                } else if (score <= 1000 && laserMaxCount < 2) {
+                } else if (score <= 1000 && laserMaxCount < 2 && laserXspeed < -4) {
                     laserXspeed += -1;
                     laserMaxCount += 1;
+                } else if(score<= 1500 && laserXspeed < -6) {
+                    laserXspeed += -0.5;
+                } else if (score<= 1500 && laserXspeed < -8) {
+                    laserXspeed += 0.5;
                 } else {
-                    laserXspeed += -1;
+                    laserXspeed += 0.1;
                 }
+                
+                
             } else if (difficulty.toLowerCase() == 'normal') { //<------ is to change the difficutlty overtime
                 if (score <= 500) {
                     laserXspeed = -3;
                 } else if (score <= 1000 && laserMaxCount < 2) {
                     laserXspeed += -2;
                     laserMaxCount += 1;
+                } else if(score<= 1500 && laserXspeed < -6) {
+                    laserXspeed += -0.5;
+                } else if (score<= 1500 && laserXspeed < -8) {
+                    laserXspeed += 0.5;
                 } else {
-                    laserXspeed += -1;
+                    laserXspeed += 0.1;
                 }
             } else if (difficulty.toLowerCase() == 'hard') {
                 if (score <= 500) {
@@ -323,8 +374,12 @@
                 } else if (score <= 1000 && laserMaxCount < 2) {
                     laserXspeed += -2;
                     laserMaxCount += 1;
+                } else if(score<= 1500 && laserXspeed < -8) {
+                    laserXspeed += -0.5;
+                } else if (score<= 1500 && laserXspeed < -10) {
+                    laserXspeed += 0.5;
                 } else {
-                    laserXspeed += -2;
+                    laserXspeed += 0.1;
                 }
             }
             if (Math.random() < 0.5) {
@@ -368,6 +423,9 @@
         function keyReleased(evt) { //check for keys released
            if(evt.keyCode == SPACEBAR) {
                 spaceBarPressed = false;
+                  if(bulletCount < bulletMaxCount) {
+                bullets.push(addBullet());
+            }   
             }
             
             if (evt.keyCode == wKey || evt.keyCode == UPARROW) {

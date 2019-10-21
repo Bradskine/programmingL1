@@ -28,8 +28,8 @@
         var playerXpos = 160;
         var playerYpos = 600;
         var playerColor = 'green';
-        const floor = 600;
-        const ceiling = 50;
+        const FLOOR = 600;
+        const CEILING = 50;
         var up = true;
         //playerSpeed vars and constants
         var playerYspeed = 0;
@@ -59,7 +59,7 @@
         
         //constants and vars for keys 
         const SPACEBAR = 32;
-        const wKey = 87;
+        const WKEY = 87;
         const UPARROW = 38;
         var jumpKeyPressed = false;
         var spaceBarPressed = false;
@@ -83,9 +83,14 @@
             name = prompt("What's your name?");
         }
         var difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard", 'Normal')
+        
         while (difficulty.toLowerCase() !== 'easy' && difficulty.toLowerCase() !== 'normal' && difficulty.toLowerCase() !== 'hard') {
             difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
         }
+        
+        
+        
+        
         alert("Hi " + name + " Hope you enjoy my game\r\n Press Up arrow to fly");
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
@@ -135,11 +140,11 @@
             });
         }
         
-        function addScientist() { 
+        function addScientist() {  //adds new scientist
             var siXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap));
             var siHeight = 50;
             var siWidth = 25;
-            var siYpos = floor;
+            var siYpos = FLOOR;
             var siXspeed = laserXspeed - 2;
             var siColour = 'white';
             var newScientist = {
@@ -195,7 +200,7 @@
             var puWidth = 50;
             var puHeight = 50;
             var puXpos = canvas.width;
-            var puYpos = Math.floor(Math.random() * ((floor + playerHeight) - ceiling) + ceiling);
+            var puYpos = Math.floor(Math.random() * ((FLOOR + playerHeight) - CEILING) + CEILING);
             var puXspeed = puXspeed;
             var newPowerUpObject = {
                 puWidth: puWidth,
@@ -248,14 +253,14 @@
             }
         }
         function playerMove() { //makes player move when space pressed
-            if (playerYpos > floor) { // so player keeps going to right spot if gos below after delay
-                playerYpos = floor;
+            if (playerYpos > FLOOR) { // so player keeps going to right spot if gos below after delay
+                playerYpos = FLOOR;
             }
-            if (playerYpos == floor) { // if player on roof resets speed as not moving
+            if (playerYpos == FLOOR) { // if player on roof resets speed as not moving
                 playerYspeed = 0;
             }
-            if (playerYpos < ceiling) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
-                playerYpos = ceiling;
+            if (playerYpos < CEILING) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
+                playerYpos = CEILING;
                 playerYspeed = 0;
             }
             if (powerUpActive == false) {
@@ -264,26 +269,26 @@
                         playerYspeed += playerAcceleration;
                     }
                 } else {
-                    if (playerYspeed < gravityMaxSpeed && playerYpos < floor) {
+                    if (playerYspeed < gravityMaxSpeed && playerYpos < FLOOR) {
                         playerYspeed += gravityChangeSpeed; //acceleration going down
                     }
                 }
-                if (playerYpos <= floor && playerYpos >= ceiling) {
+                if (playerYpos <= FLOOR && playerYpos >= CEILING) {
                     playerYpos += playerYspeed; //makes player move
                 }
             } else {
                 if (up == true) { //diffirent movement for powerup changes grabity so ever going up or going down
-                    if (playerYspeed < gravityMaxSpeed && playerYpos < floor) {
+                    if (playerYspeed < gravityMaxSpeed && playerYpos < FLOOR) {
                         playerYspeed += gravityChangeSpeed; //acceleration going down
                     }
-                    if (playerYpos <= floor) {
+                    if (playerYpos <= FLOOR) {
                         playerYpos += playerYspeed;
                     }
                 } else {
                     if (playerYspeed > playerMaxSpeed) {
                         playerYspeed += playerAcceleration;
                     }
-                    if (playerYpos <= floor && playerYpos >= ceiling) {
+                    if (playerYpos <= FLOOR && playerYpos >= CEILING) {
                         playerYpos += playerYspeed; //makes player move
                     }
                 }
@@ -396,7 +401,7 @@
             }
             var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap)) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later         
             //max  -  min       + min
-            var laserYpos = Math.floor(Math.random() * ((floor + playerHeight) - ceiling) + ceiling);
+            var laserYpos = Math.floor(Math.random() * ((FLOOR + playerHeight) - CEILING) + CEILING);
             var newLaserObject = {
                 laserWidth: laserWidth,
                 laserXpos: laserXpos, //need to change making not move
@@ -411,11 +416,10 @@
             drawImg(playerImg, playerXpos, playerYpos, playerWidth, playerHeight);
         }
         function keyPressed(evt) { //checks for keys pressed
-            if (evt.keyCode == wKey || evt.keyCode == UPARROW) {
+            if (evt.keyCode == WKEY || evt.keyCode == UPARROW) {
                 jumpKeyPressed = true;
                 //                console.log('pressed')
             }
-
             if(evt.keyCode == SPACEBAR) {
                 spaceBarPressed = true;
             }
@@ -428,7 +432,7 @@
             }   
             }
             
-            if (evt.keyCode == wKey || evt.keyCode == UPARROW) {
+            if (evt.keyCode == WKEY || evt.keyCode == UPARROW) {
                 jumpKeyPressed = false;
                 if (powerUpActive == true) {
                     if (up == true) {

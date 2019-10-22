@@ -7,7 +7,7 @@
 
 
 <body>
-    <canvas id="gameCanvas" width="800" height="700" ></canvas>
+    <canvas id="gameCanvas" width="800" height="600" ></canvas>
  
     <style>
        canvas { /* center canvas*/
@@ -25,10 +25,11 @@
         //player variables
         var playerWidth = 70;
         var playerHeight = 70;
-        var playerXpos = 160;
-        var playerYpos = 600;
+        var playerXpos = 0;
+        var playerYpos = 0;
+        var playerStartPos = 0;
         var playerColor = 'green';
-        const FLOOR = 600;
+        var floor = 0; // a variable that changes becase it is based on canvas
         const CEILING = 50;
         var up = true;
         //playerSpeed vars and constants
@@ -55,7 +56,6 @@
         var bullets = [];
         var bulletCount = 0;
         var bulletMaxCount = 6;
-            
         
         //constants and vars for keys 
         const SPACEBAR = 32;
@@ -64,12 +64,14 @@
         var jumpKeyPressed = false;
         var spaceBarPressed = false;
         var score = 1;
+        var scientistKilled = 0;
         //PowerUP/gravitysuit
         var powerUps = [];
         var powerUpActive = false;
         const GRAVITYSUITWIDTH = 50;
         const GRAVITYSUITHEIGHT = 50;
         //game over
+        
         var gameOverScreen = new Image();
         var playerImg = new Image();
         gameOverScreen.src = 'img/GameOver.jpg'
@@ -88,6 +90,12 @@
             difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
         }
         
+//         var difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard", 'Normal')
+//        
+//        while (difficulty.toLowerCase() !== 'easy' && difficulty.toLowerCase() !== 'normal' && difficulty.toLowerCase() !== 'hard') {
+//            difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
+//        }
+        
         
         
         
@@ -101,6 +109,10 @@
             }
             for (var i = siCount; i < siMaxCount; i++) {
                 scientist.push(addScientist());
+            }
+            
+            for (var i = 0; i <1; i++) {
+                startPos();
             }
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
@@ -120,6 +132,15 @@
             scientistMove();
         } //End of main loop;
         
+        function startPos() {
+            playerXpos = 160;
+            floor = canvas.height - 50;
+             playerYpos = floor - playerHeight;
+            playerStartPos = floor - playerHeight;
+        }
+        
+        
+        
         function drawScientist() { // draws the scientist
             scientist.forEach(function(si, index, array) {
                 colorRect(si.siXpos,si.siYpos ,si.siWidth ,si.siHeight ,si.siColor );
@@ -134,9 +155,9 @@
                     siCount -= 1;
                 }
                 
-//                if (siCount < siMaxCount) {
-//                    scientist.push(addScientist()); //makes new scientist if less than max count which is based on difficulty and score
-//                }      
+                if (siCount < siMaxCount) {
+                    scientist.push(addScientist()); //makes new scientist if less than max count which is based on difficulty and score
+                }      
             });
         }
         
@@ -144,7 +165,7 @@
             var siXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap));
             var siHeight = 50;
             var siWidth = 25;
-            var siYpos = FLOOR;
+            var siYpos = floor - 50;
             var siXspeed = laserXspeed - 2;
             var siColour = 'white';
             var newScientist = {
@@ -193,6 +214,17 @@
                  delete(bullet.bulletXpos);
                 bulletCount -=1;
              }
+                
+              scientist.forEach(function(si,index,array) {  // to check if any bullets are touching any scientist
+             if(bullet.bulletXpos < si.siXpos + si.siWidth && 
+                bullet.bulletXpos + bullet.bulletWidth > si.siXpos &&
+                bullet.bulletYpos < si.siYpos + si.siHeight &&
+                bullet.bulletYpos + bullet.bulletHeight >= si.siYpos) {
+                  delete si.siXpos;
+                 siCount -+ 1;
+                  scientistKilled += 1;
+             }
+              });               
         });
         }
         
@@ -200,7 +232,7 @@
             var puWidth = 50;
             var puHeight = 50;
             var puXpos = canvas.width;
-            var puYpos = Math.floor(Math.random() * ((FLOOR + playerHeight) - CEILING) + CEILING);
+            var puYpos = Math.floor(Math.random() * ((playerStartPos + playerHeight) - CEILING) + CEILING);
             var puXspeed = puXspeed;
             var newPowerUpObject = {
                 puWidth: puWidth,
@@ -240,9 +272,10 @@
             });
         }
         function drawScore() {
-            canvasContext.font = "26px Arial";
+            canvasContext.font = "27px Arial";
             canvasContext.fillStyle = "red";
             canvasContext.fillText("Score: " + score, 15, 30);
+            canvasContext.fillText("SCIENIST KILLED: " + scientistKilled, canvas.width / 2, 30)
             if (gameFinished == false) {
                 score += 1;
             }
@@ -253,10 +286,10 @@
             }
         }
         function playerMove() { //makes player move when space pressed
-            if (playerYpos > FLOOR) { // so player keeps going to right spot if gos below after delay
-                playerYpos = FLOOR;
+            if (playerYpos > playerStartPos) { // so player keeps going to right spot if gos below after delay
+                playerYpos = playerStartPos;
             }
-            if (playerYpos == FLOOR) { // if player on roof resets speed as not moving
+            if (playerYpos == playerStartPos) { // if player on roof resets speed as not moving
                 playerYspeed = 0;
             }
             if (playerYpos < CEILING) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
@@ -269,26 +302,26 @@
                         playerYspeed += playerAcceleration;
                     }
                 } else {
-                    if (playerYspeed < gravityMaxSpeed && playerYpos < FLOOR) {
+                    if (playerYspeed < gravityMaxSpeed && playerYpos < playerStartPos) {
                         playerYspeed += gravityChangeSpeed; //acceleration going down
                     }
                 }
-                if (playerYpos <= FLOOR && playerYpos >= CEILING) {
+                if (playerYpos <= playerStartPos && playerYpos >= CEILING) {
                     playerYpos += playerYspeed; //makes player move
                 }
             } else {
                 if (up == true) { //diffirent movement for powerup changes grabity so ever going up or going down
-                    if (playerYspeed < gravityMaxSpeed && playerYpos < FLOOR) {
+                    if (playerYspeed < gravityMaxSpeed && playerYpos < playerStartPos) {
                         playerYspeed += gravityChangeSpeed; //acceleration going down
                     }
-                    if (playerYpos <= FLOOR) {
+                    if (playerYpos <= playerStartPos) {
                         playerYpos += playerYspeed;
                     }
                 } else {
                     if (playerYspeed > playerMaxSpeed) {
                         playerYspeed += playerAcceleration;
                     }
-                    if (playerYpos <= FLOOR && playerYpos >= CEILING) {
+                    if (playerYpos <= playerStartPos && playerYpos >= CEILING) {
                         playerYpos += playerYspeed; //makes player move
                     }
                 }
@@ -401,7 +434,7 @@
             }
             var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap)) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later         
             //max  -  min       + min
-            var laserYpos = Math.floor(Math.random() * ((FLOOR + playerHeight) - CEILING) + CEILING);
+            var laserYpos = Math.floor(Math.random() * ((playerStartPos + playerHeight) - CEILING) + CEILING);
             var newLaserObject = {
                 laserWidth: laserWidth,
                 laserXpos: laserXpos, //need to change making not move

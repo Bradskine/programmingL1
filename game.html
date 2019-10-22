@@ -17,8 +17,12 @@
     margin-right: auto;
     display: block;
     width: 800px;
+           
 }
-    
+      h2 {
+            color: red;
+           font-size: 50px;
+      }
     </style>
     <script>
         var canvas, canvasContext;
@@ -55,7 +59,7 @@
         //gun
         var bullets = [];
         var bulletCount = 0;
-        var bulletMaxCount = 6;
+        var bulletMaxCount = 4;
         
         //constants and vars for keys 
         const SPACEBAR = 32;
@@ -99,7 +103,7 @@
         
         
         
-        alert("Hi " + name + " Hope you enjoy my game\r\n Press Up arrow to fly");
+        alert("Hi " + name + " Hope you enjoy my game\r\n Press Up arrow or to fly\r\n Press SbaceBar to shoot");
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
@@ -117,7 +121,11 @@
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
+        
+        var gameStop = false;
+        
         function mainloop() {
+            if(gameFinished == false) {
             colorRect(0, 0, canvas.width, canvas.height, 'black');
             drawPlayer();
             playerMove();
@@ -130,6 +138,11 @@
             bulletMove();
             drawScientist();
             scientistMove();
+            }   else {
+                delete bullets.bulletXpos;
+                delete scientist.siXpos;
+                delete playerXpos;
+            }
         } //End of main loop;
         
         function startPos() {
@@ -221,8 +234,8 @@
                 bullet.bulletYpos < si.siYpos + si.siHeight &&
                 bullet.bulletYpos + bullet.bulletHeight >= si.siYpos) {
                   delete si.siXpos;
-                 siCount -+ 1;
-                  scientistKilled += 1;
+                 siCount -= 1;
+                scientistKilled += 1;
              }
               });               
         });
@@ -266,7 +279,7 @@
                     playerAcceleration = -4;
                     gravityChangeSpeed = 4;
                     gravityMaxSpeed = 12;
-                    playerImg.src = 'img/gravityGuyUp.jpg'
+                    playerImg.src = 'img/gravityGuyOnABikeUp.jpg'
                     var UP = true;
                 }
             });
@@ -364,6 +377,7 @@
                         laser.laserXpos += 200;
                     } else { //bugged
                         gameOver();
+                        
                     }
                     //checked if any of sides are not touching player
                 }
@@ -416,8 +430,11 @@
                     laserXspeed += -0.5;
                 } else if (score<= 1500 && laserXspeed < -10) {
                     laserXspeed += 0.5;
+                    siCount = 4;
                 } else {
                     laserXspeed += 0.1;
+                    siCount += 1;
+
                 }
             }
             if (Math.random() < 0.5) {
@@ -470,10 +487,10 @@
                 if (powerUpActive == true) {
                     if (up == true) {
                         up = false;
-                        playerImg.src = 'img/gravityGuyDown.jpg'
+                        playerImg.src = 'img/gravityGuyOnABikeDown.jpg'
                     } else {
                         up = true;
-                        playerImg.src = 'img/gravityGuyUp.jpg'
+                        playerImg.src = 'img/gravityGuyOnABikeUp.jpg'
                     }
                 }
                 //                console.log('released')
@@ -489,10 +506,22 @@
             canvasContext.drawImage(src, x, y, w, h);
         }
         function gameOver() {
-            drawImg(gameOverScreen, 0, 0, canvas.width, canvas.height);
-            alert('your score is ' + score);
             gameFinished = true;
+            drawScore();
+            drawImg(gameOverScreen, 0, 0, canvas.width, canvas.height);
         }
     </script>
+    
+    <h2> Use up arrow or w key to fly<br>
+    press spaceBar to shoot<br>
+    Try get as high of a score by going as far as you can
+    
+    </h2>
+    
+    
+    
+    
+    
+    
 
 </body>

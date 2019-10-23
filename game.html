@@ -17,12 +17,14 @@
     margin-right: auto;
     display: block;
     width: 800px;
+    background-image: 'img/background.jpg';
            
 }
       h2 {
             color: red;
            font-size: 50px;
       }
+        
     </style>
     <script>
         var canvas, canvasContext;
@@ -33,7 +35,7 @@
         var playerYpos = 0;
         var playerStartPos = 0;
         var playerColor = 'green';
-        var floor = 0; // a variable that changes becase it is based on canvas
+        var floor = 999; // a variable that changes becase it is based on canvas
         const CEILING = 50;
         var up = true;
         //playerSpeed vars and constants
@@ -78,8 +80,11 @@
         
         var gameOverScreen = new Image();
         var playerImg = new Image();
+        var siImg = new Image();
         gameOverScreen.src = 'img/GameOver.jpg'
         playerImg.src = 'img/Player.jpg'
+        siImg.src= 'img/siSkin1.jpg'
+        
         
         
         var gameFinished = false; //prompts to ask difficulty and name
@@ -157,6 +162,7 @@
         function drawScientist() { // draws the scientist
             scientist.forEach(function(si, index, array) {
                 colorRect(si.siXpos,si.siYpos ,si.siWidth ,si.siHeight ,si.siColor );
+                drawImg(siImg,si.siXpos,si.siYpos,si.siWidth,si.siHeight);
             });
         }
         function scientistMove() {
@@ -180,14 +186,18 @@
             var siWidth = 25;
             var siYpos = floor - 50;
             var siXspeed = laserXspeed - 2;
-            var siColour = 'white';
+           if (Math.random() < 0.5) { 
+               siImg.src = 'img/siSkin2.jpg';
+           } else {
+               siImg.src = 'img/siSkin1.jpg'
+           }
+                
             var newScientist = {
                 siXpos: siXpos,
                 siHeight: siHeight, //need to change making not move
                 siWidth: siWidth,
                 siYpos: siYpos,
-                siXspeed: siXspeed,
-                siColor: siColour
+                siXspeed: siXspeed
             }
             siCount += 1;
             return newScientist; //returns new laser vars for new lasers   
@@ -297,6 +307,9 @@
                     powerUps.push(randPowerUp());
                 }
             }
+            
+            
+            
         }
         function playerMove() { //makes player move when space pressed
             if (playerYpos > playerStartPos) { // so player keeps going to right spot if gos below after delay
@@ -377,7 +390,6 @@
                         laser.laserXpos += 200;
                     } else { //bugged
                         gameOver();
-                        
                     }
                     //checked if any of sides are not touching player
                 }
@@ -400,24 +412,23 @@
                 } else if(score<= 1500 && laserXspeed < -6) {
                     laserXspeed += -0.5;
                 } else if (score<= 1500 && laserXspeed < -8) {
-                    laserXspeed += 0.5;
+                    laserXspeed += -0.5;
                 } else {
-                    laserXspeed += 0.1;
+                    laserXspeed += -0.1;
                 }
-                
-                
+         
             } else if (difficulty.toLowerCase() == 'normal') { //<------ is to change the difficutlty overtime
                 if (score <= 500) {
                     laserXspeed = -3;
                 } else if (score <= 1000 && laserMaxCount < 2) {
                     laserXspeed += -2;
                     laserMaxCount += 1;
-                } else if(score<= 1500 && laserXspeed < -6) {
+                } else if(score<= 1500 && laserXspeed < -8) {
                     laserXspeed += -0.5;
-                } else if (score<= 1500 && laserXspeed < -8) {
-                    laserXspeed += 0.5;
-                } else {
-                    laserXspeed += 0.1;
+                } else if (score<= 1500 && laserXspeed < -12) {
+                    laserXspeed += -0.5;
+                } else{
+                    laserXspeed += -0.2;
                 }
             } else if (difficulty.toLowerCase() == 'hard') {
                 if (score <= 500) {
@@ -426,17 +437,29 @@
                 } else if (score <= 1000 && laserMaxCount < 2) {
                     laserXspeed += -2;
                     laserMaxCount += 1;
-                } else if(score<= 1500 && laserXspeed < -8) {
+                } else if(score<= 1500 && laserXspeed < -9) {
                     laserXspeed += -0.5;
-                } else if (score<= 1500 && laserXspeed < -10) {
-                    laserXspeed += 0.5;
+                } else if (score<= 1500 && laserXspeed < -14) {
+                    laserXspeed += -0.5;
                     siCount = 4;
                 } else {
-                    laserXspeed += 0.1;
+                    laserXspeed += -0.1;
                     siCount += 1;
 
                 }
             }
+            
+            if(score <= 500) {
+                maxGap = 0;
+            }  else if(score<= 1000) {
+                maxGap = 150;
+            } else if (score<= 1500) {
+                maxGap = 370;  
+            }    else {
+                maxGap = 500;
+            }
+            
+            
             if (Math.random() < 0.5) {
                 var laserShape = 1; // 1 is horizontal
             } else {
@@ -449,9 +472,10 @@
                 var laserWidth = 30;
                 var laserHeight = 200;
             }
-            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap)) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later         
+        
+            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap) + minGap) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later         
             //max  -  min       + min
-            var laserYpos = Math.floor(Math.random() * ((playerStartPos + playerHeight) - CEILING) + CEILING);
+            var laserYpos = Math.floor(Math.random() * (floor - laserHeight - CEILING) + CEILING) ;
             var newLaserObject = {
                 laserWidth: laserWidth,
                 laserXpos: laserXpos, //need to change making not move
@@ -518,10 +542,4 @@
     
     </h2>
     
-    
-    
-    
-    
-    
-
 </body>

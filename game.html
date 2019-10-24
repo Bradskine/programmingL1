@@ -17,18 +17,17 @@
     margin-right: auto;
     display: block;
     width: 800px;
-    background-image: 'img/background.jpg';
            
 }
       h2 {
-            color: red;
+           color: red;
            font-size: 50px;
       }
         
     </style>
     <script>
         var canvas, canvasContext;
-        //player variables
+        //player variablesx
         var playerWidth = 70;
         var playerHeight = 70;
         var playerXpos = 0;
@@ -81,10 +80,11 @@
         var gameOverScreen = new Image();
         var playerImg = new Image();
         var siImg = new Image();
+        var bg = new Image();
         gameOverScreen.src = 'img/GameOver.jpg'
         playerImg.src = 'img/Player.jpg'
         siImg.src= 'img/siSkin1.jpg'
-        
+        bg.src= 'img/background.jpg'
         
         
         var gameFinished = false; //prompts to ask difficulty and name
@@ -95,30 +95,25 @@
         }
         var difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard", 'Normal')
         
+        if(difficulty == null) {
+             difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
+        }
         while (difficulty.toLowerCase() !== 'easy' && difficulty.toLowerCase() !== 'normal' && difficulty.toLowerCase() !== 'hard') {
             difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
+            
+            if(difficulty == null) {
+             difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
+        }
         }
         
-//         var difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard", 'Normal')
-//        
-//        while (difficulty.toLowerCase() !== 'easy' && difficulty.toLowerCase() !== 'normal' && difficulty.toLowerCase() !== 'hard') {
-//            difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
-//        }
         
         
-        
-        
-        alert("Hi " + name + " Hope you enjoy my game\r\n Press Up arrow or to fly\r\n Press SbaceBar to shoot");
+        alert("Hi " + name + " Hope you enjoy my game\r\n Press Up arrow or to fly\r\n Press SPaceBar to shoot");
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
             setInterval(mainloop, 1000 / 50);
-            for (var i = laserCount; i < laserMaxCount; i++) {
-                lasers.push(randLaser());
-            }
-            for (var i = siCount; i < siMaxCount; i++) {
-                scientist.push(addScientist());
-            }
+           
             
             for (var i = 0; i <1; i++) {
                 startPos();
@@ -132,6 +127,7 @@
         function mainloop() {
             if(gameFinished == false) {
             colorRect(0, 0, canvas.width, canvas.height, 'black');
+            drawImg(bg,0,0,canvas.width, canvas.height);
             drawPlayer();
             playerMove();
             drawLasers();
@@ -152,9 +148,17 @@
         
         function startPos() {
             playerXpos = 160;
+            score = 1;
             floor = canvas.height - 50;
              playerYpos = floor - playerHeight;
             playerStartPos = floor - playerHeight;
+             for (var i = laserCount; i < laserMaxCount; i++) {
+                lasers.push(randLaser());
+            }
+            for (var i = siCount; i < siMaxCount; i++) {
+                scientist.push(addScientist());
+            }
+            laserXspeed = 0;
         }
         
         
@@ -242,10 +246,11 @@
              if(bullet.bulletXpos < si.siXpos + si.siWidth && 
                 bullet.bulletXpos + bullet.bulletWidth > si.siXpos &&
                 bullet.bulletYpos < si.siYpos + si.siHeight &&
-                bullet.bulletYpos + bullet.bulletHeight >= si.siYpos) {
+                bullet.bulletYpos + bullet.bulletHeight >= si.siYpos &&
+                si.siXpos < canvas.width) {
                   delete si.siXpos;
                  siCount -= 1;
-                scientistKilled += 1;
+                scientistKilled += 0.5;
              }
               });               
         });

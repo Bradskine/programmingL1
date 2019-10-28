@@ -18,20 +18,17 @@
             margin-right: auto;
             display: block;
             width: 800px;
-
         }
-
         h2 {
             color: red;
             font-size: 50px;
         }
-
     </style>
     <script>
         var canvas, canvasContext;
         //player variablesx
-        var playerWidth = 70;
-        var playerHeight = 70;
+        var playerWidth = 60;
+        var playerHeight = 100;
         var playerXpos = 0;
         var playerYpos = 0;
         var playerStartPos = 0;
@@ -58,12 +55,15 @@
         //scientist
         var scientist = [];
         var siCount = 0;
-        var siMaxCount = 2;
+        var siMaxCount = 1;
+        const siHeight = 50;
+        const siWidth = 25;
         //gun
         var bullets = [];
         var bulletCount = 0;
         var bulletMaxCount = 4;
-
+        const bulletWidth = 30;
+        const bulletHeight = 30;
         //constants and vars for keys 
         const SPACEBAR = 32;
         const WKEY = 87;
@@ -74,23 +74,28 @@
         var restartKeyPressed = false;
         var score = 1;
         var scientistKilled = 0;
+        //life for scientists making it past
+        var lifes = 0;
         //PowerUP/gravitysuit
         var powerUps = [];
         var powerUpActive = false;
+        const puWidth = 50;
+        const puHeight = 50;
         const GRAVITYSUITWIDTH = 50;
         const GRAVITYSUITHEIGHT = 50;
         //game over
-
         var gameOverScreen = new Image();
         var playerImg = new Image();
         var siImg = new Image();
         var bg = new Image();
+        var laserImg = new Image();
+        var bulletImg = new Image(); 
+        bulletImg.src = 'img/bullet.png'
+        laserImg.src = 'img/laser.png'
         gameOverScreen.src = 'img/GameOver.jpg'
-        playerImg.src = 'img/Player.jpg'
+        playerImg.src = 'img/player2.png'
         siImg.src = 'img/siSkin1.jpg'
         bg.src = 'img/background.jpg'
-
-
         var gameFinished = false; //prompts to ask difficulty and name
         var name = prompt("What's your name")
         while (name.length == 0 || name == 'null') {
@@ -98,36 +103,27 @@
             name = prompt("What's your name?");
         }
         var difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard", 'Normal')
-
         if (difficulty == null) {
             difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
         }
         while (difficulty.toLowerCase() !== 'easy' && difficulty.toLowerCase() !== 'normal' && difficulty.toLowerCase() !== 'hard') {
             difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
-
             if (difficulty == null) {
                 difficulty = prompt("What difficulty do you want to play at, Easy, Normal or Hard")
             }
         }
-
-
-
-        alert("Hi " + name + " Hope you enjoy my game\r\n Press Up arrow or to fly\r\n Press SPaceBar to shoot");
+        alert("Hi " + name + " Hope you enjoy my game\r\n Press Up arrow or to fly\r\n Press SPaceBar to shoot\r\n Try survive for as long as you can to beat your previous score");
         window.onload = function() {
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
             setInterval(mainloop, 1000 / 50);
-
-
             for (var i = 0; i < 1; i++) {
                 startPos();
             }
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
-
         var gameStop = false;
-
         function mainloop() {
             console.log()
             if (gameFinished == false) {
@@ -153,50 +149,54 @@
                 }
             }
         } //End of main loop;
-
         function startPos() {
-            console.log('hello')
+            
+            if(difficulty.toLowerCase() == 'easy') {
+                lifes = 20;
+            }    else if ( difficulty.toLowerCase() == 'normal') {
+                lifes = 10;
+            }  else  if (difficulty.toLowerCase() == 'hard'){
+                lifes  =  3;
+            }
+            
+            
+            gameFinished = false;
+            scientistKilled = 0;
             playerXpos = 160;
             score = 0;
             floor = canvas.height - 50;
             playerYpos = floor - playerHeight;
-            playerStartPos = floor - playerHeight;
+            playerStartPos = floor - playerHeight;            
             for (var i = laserCount; i < laserMaxCount; i++) {
                 lasers.push(randLaser());
             }
             for (var i = siCount; i < siMaxCount; i++) {
                 scientist.push(addScientist());
             }
+            
         }
-
-
-
         function drawScientist() { // draws the scientist
             scientist.forEach(function(si, index, array) {
-                colorRect(si.siXpos, si.siYpos, si.siWidth, si.siHeight, si.siColor);
-                drawImg(siImg, si.siXpos, si.siYpos, si.siWidth, si.siHeight);
+                drawImg(siImg, si.siXpos, si.siYpos, siWidth, siHeight);
             });
         }
-
         function scientistMove() {
             scientist.forEach(function(si, index, array) {
-
+                
                 si.siXpos += si.siXspeed;
-                if (si.siXpos + si.siWidth <= 0) {
-                    delete si.siXpos; //deletes current xpos to reset on other side
-                    siCount -= 1;
+                if (si.siXpos + siWidth <= 0) {
+                   si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100); //deletes current xpos to reset on other side
+                    lifes -= 1;
+                    console.log('testing')
+                    if(lifes < 1 ) {
+                        gameOver();
+                    }
                 }
-
-                if (siCount < siMaxCount) {
-                    scientist.push(addScientist()); //makes new scientist if less than max count which is based on difficulty and score
-                }
+               
             });
         }
-
         function addScientist() { //adds new scientist
-            var siXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap));
-            var siHeight = 50;
-            var siWidth = 25;
+            var siXpos = canvas.width + Math.floor(Math.random() * (500) + 100);
             var siYpos = floor - 50;
             var siXspeed = laserXspeed - 2;
             if (Math.random() < 0.5) {
@@ -204,95 +204,73 @@
             } else {
                 siImg.src = 'img/siSkin1.jpg'
             }
-
             var newScientist = {
                 siXpos: siXpos,
-                siHeight: siHeight, //need to change making not move
-                siWidth: siWidth,
                 siYpos: siYpos,
                 siXspeed: siXspeed
             }
-            siCount += 1;
+            
             return newScientist; //returns new laser vars for new lasers   
         }
-
         function drawBullets() {
             bullets.forEach(function(bullet, index, array) {
-                colorRect(bullet.bulletXpos, bullet.bulletYpos, bullet.bulletWidth, bullet.bulletHeight, 'blue');
+                drawImg(bulletImg, bullet.bulletXpos, bullet.bulletYpos, bulletWidth, bulletHeight)
             });
-
         }
-
         function addBullet() {
             var bulletSpeed = 10;
-            var bulletYpos = playerYpos;
-            var bulletXpos = playerXpos + 50;
-            var bulletWidth = 30;
-            var bulletHeight = 30;
+            var bulletYpos = playerYpos + 50;
+            var bulletXpos = playerXpos + playerWidth;
             var newBulletObject = {
                 bulletSpeed: bulletSpeed,
                 bulletYpos: bulletYpos,
                 bulletXpos: bulletXpos,
-                bulletWidth: bulletWidth,
-                bulletHeight: bulletHeight
             }
             bulletCount += 1;
             return newBulletObject;
         }
-
-
-
         function bulletMove() {
             bullets.forEach(function(bullet, index, array) {
                 bullet.bulletXpos += bullet.bulletSpeed;
-
                 if (bullet.bulletXpos > canvas.width) {
-                    delete(bullet.bulletXpos);
+                    delete  bullet.bulletXpos;
                     bulletCount -= 1;
                 }
-
                 scientist.forEach(function(si, index, array) { // to check if any bullets are touching any scientist
-                    if (bullet.bulletXpos < si.siXpos + si.siWidth &&
-                        bullet.bulletXpos + bullet.bulletWidth > si.siXpos &&
-                        bullet.bulletYpos < si.siYpos + si.siHeight &&
-                        bullet.bulletYpos + bullet.bulletHeight >= si.siYpos &&
+                    if (bullet.bulletXpos < si.siXpos + siWidth &&
+                        bullet.bulletXpos + bulletWidth > si.siXpos &&
+                        bullet.bulletYpos < si.siYpos + siHeight &&
+                        bullet.bulletYpos +bulletHeight >= si.siYpos &&
                         si.siXpos < canvas.width) {
                         delete si.siXpos;
-                        siCount -= 1;
-                        scientistKilled += 0.5;
+                        siXpos = si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100); 
+                        scientistKilled += 1;
                     }
                 });
             });
         }
-
         function randPowerUp() { // makes random power up
-            var puWidth = 50;
-            var puHeight = 50;
             var puXpos = canvas.width;
             var puYpos = Math.floor(Math.random() * ((playerStartPos + playerHeight) - CEILING) + CEILING);
             var puXspeed = puXspeed;
             var newPowerUpObject = {
-                puWidth: puWidth,
                 puXpos: puXpos, //need to change making not move
                 puYpos: puYpos,
-                puHeight: puHeight,
                 puXspeed: puXspeed
             }
             return newPowerUpObject; //end of rand power up
         }
-
         function drawPowerUp() { // draws the lasers
             powerUps.forEach(function(powerUP, index, array) {
-                colorRect(powerUP.puXpos, powerUP.puYpos, powerUP.puWidth, powerUP.puHeight, 'blue');
+                colorRect(powerUP.puXpos, powerUP.puYpos, puWidth,puHeight, 'blue');
             });
         }
-
         function powerUpMove() {
             powerUps.forEach(function(powerUp, index, array) {
                 powerUp.puXpos += laserXspeed;
-                if (powerUp.puYpos + powerUp.puHeight < playerYpos ||
+                if (powerUp.puYpos + puHeight < playerYpos || 
                     powerUp.puYpos > playerYpos + playerHeight ||
-                    powerUp.puXpos + powerUp.puWidth < playerXpos ||
+                    powerUp.puXpos + puWidth < playerXpos ||
                     powerUp.puXpos > playerXpos + playerWidth) {
                     //checked if any of sides are not touching player
                 } else {
@@ -310,12 +288,12 @@
                 }
             });
         }
-
         function drawScore() {
-            canvasContext.font = "27px Arial";
+            canvasContext.font = "28px Arial";
             canvasContext.fillStyle = "red";
             canvasContext.fillText("Score: " + score, 15, 30);
-            canvasContext.fillText("SCIENIST KILLED: " + scientistKilled, canvas.width / 2, 30)
+            canvasContext.fillText("Scientist Killed: " + scientistKilled, canvas.width / 2 + 30, 30)
+            canvasContext.fillText("lifes: " + lifes, canvas.width / 3, 30);
             if (gameFinished == false) {
                 score += 1;
             }
@@ -324,11 +302,7 @@
                     powerUps.push(randPowerUp());
                 }
             }
-
-
-
         }
-
         function playerMove() { //makes player move when space pressed
             if (playerYpos > playerStartPos) { // so player keeps going to right spot if gos below after delay
                 playerYpos = playerStartPos;
@@ -373,10 +347,9 @@
         } //end of playerMove function
         function drawLasers() { // draws the lasers
             lasers.forEach(function(laser, index, array) {
-                colorRect(laser.laserXpos, laser.laserYpos, laser.laserWidth, laser.laserHeight, 'red');
+                drawImg(laserImg,laser.laserXpos, laser.laserYpos, laser.laserWidth, laser.laserHeight);
             });
         }
-
         function laserMove() {
             lasers.forEach(function(laser, index, array) {
                 laser.laserXpos += laserXspeed;
@@ -402,7 +375,7 @@
                         // grabity vars and const
                         gravityChangeSpeed = 0.5;
                         gravityMaxSpeed = 9;
-                        playerImg.src = 'img/Player.jpg'
+                        playerImg.src = 'img/player2.png'
                         var UP = true;
                         delete laser.laserXpos;
                         laserCount -= 1;
@@ -425,7 +398,7 @@
             if (difficulty.toLowerCase() == 'easy') {
                 if (score <= 500) {
                     laserXspeed = -3;
-                } else if (score <= 1000 && laserMaxCount < 2 && laserXspeed < -4) {
+                } else if (score <= 1000 && laserMaxCount < 2 && laserXspeed < -4) {    //changes difficulty of the laers
                     laserXspeed += -1;
                     laserMaxCount += 1;
                 } else if (score <= 1500 && laserXspeed < -6) {
@@ -435,7 +408,6 @@
                 } else {
                     laserXspeed += -0.1;
                 }
-
             } else if (difficulty.toLowerCase() == 'normal') { //<------ is to change the difficutlty overtime
                 if (score <= 500) {
                     laserXspeed = -3;
@@ -450,34 +422,27 @@
                     laserXspeed += -0.2;
                 }
             } else if (difficulty.toLowerCase() == 'hard') {
-                if (score <= 500) {
+                if (score <= 500 && laserMaxCount < 2) {
                     laserXspeed = -7;
                     laserMaxCount += 1;
-                } else if (score <= 1000 && laserMaxCount < 2) {
+                } else if (score <= 1000 && laserMaxCount < 3) {
                     laserXspeed += -2;
                     laserMaxCount += 1;
                 } else if (score <= 1500 && laserXspeed < -9) {
                     laserXspeed += -0.5;
                 } else if (score <= 1500 && laserXspeed < -14) {
                     laserXspeed += -0.5;
-                    siCount = 4;
                 } else {
                     laserXspeed += -0.1;
-                    siCount += 1;
                 }
             }
-
-            if (score <= 500) {
+            if (score <= 500) {    // changes gap for lasers the higher the score so not big gaps with no laser at the begining
                 maxGap = 0;
-            } else if (score <= 1000) {
-                maxGap = 150;
-            } else if (score <= 1500) {
-                maxGap = 370;
-            } else {
+                minGap = 0;
+            } else  {
                 maxGap = 500;
-            }
-
-
+                minGap = 200;
+            } 
             if (Math.random() < 0.5) {
                 var laserShape = 1; // 1 is horizontal
             } else {
@@ -490,7 +455,6 @@
                 var laserWidth = 30;
                 var laserHeight = 200;
             }
-
             var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap) + minGap) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later         
             //max  -  min       + min
             var laserYpos = Math.floor(Math.random() * (floor - laserHeight - CEILING) + CEILING);
@@ -504,11 +468,9 @@
             laserCount += 1;
             return newLaserObject; //returns new laser vars for new lasers
         }
-
         function drawPlayer() { // to draw player
             drawImg(playerImg, playerXpos, playerYpos, playerWidth, playerHeight);
         }
-
         function keyPressed(evt) { //checks for keys pressed
             if (evt.keyCode == WKEY || evt.keyCode == UPARROW) {
                 jumpKeyPressed = true;
@@ -517,13 +479,10 @@
             if (evt.keyCode == SPACEBAR) {
                 spaceBarPressed = true;
             }
-
             if (evt.keyCode == RKEY) {
                 restartKeyPressed = true;
             }
-
         }
-
         function keyReleased(evt) { //check for keys released
             if (evt.keyCode == SPACEBAR) {
                 spaceBarPressed = false;
@@ -531,11 +490,9 @@
                     bullets.push(addBullet());
                 }
             }
-
             if (evt.keyCode == RKEY) {
                 restartKeyPressed = false;
             }
-
             if (evt.keyCode == WKEY || evt.keyCode == UPARROW) {
                 jumpKeyPressed = false;
                 if (powerUpActive == true) {
@@ -549,31 +506,24 @@
                 }
                 //                console.log('released')
             }
-
-
         }
-
         function colorRect(x, y, w, h, c) { // to draw things parameters are xpos ,ypos ,width ,height and ,color.
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
-
         function drawImg(src, x, y, w, h) {
             canvasContext.drawImage(src, x, y, w, h);
         }
-
         function gameOver() {
             gameFinished = true;
             drawScore();
+            delete lasers;
             drawImg(gameOverScreen, 0, 0, canvas.width, canvas.height);
         }
-
     </script>
 
-    <h2> Use up arrow or w key to fly<br>
-        press spaceBar to shoot<br>
-        Try get as high of a score by going as far as you can
-
+    <h2> 
+    Press R key to Restart
     </h2>
 
 </body>

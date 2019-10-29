@@ -3,11 +3,12 @@
 <head>
 
     <title>game</title>
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower&display=swap" rel="stylesheet">
 </head>
 
 
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <canvas id="gameCanvas" width="600" height="500"></canvas>
 
     <style>
         canvas {
@@ -34,7 +35,7 @@
         var playerStartPos = 0;
         var playerColor = 'green';
         var floor = 999; // a variable that changes becase it is based on canvas
-        const CEILING = 50;
+        var ceiling = 0;
         var up = true;
         //playerSpeed vars and constants
         var playerYspeed = 0;
@@ -50,6 +51,8 @@
         var laserCount = 0;
         var laserMaxCount = 1;
         var laserXspeed = 0;
+        var laserMaxLength = 0;
+        var laserMinLength = 0;
         var minGap = 0;
         var maxGap = 500;
         //scientist
@@ -62,7 +65,7 @@
         var bullets = [];
         var bulletCount = 0;
         var bulletMaxCount = 4;
-        const bulletWidth = 30;
+        const bulletWidth = 30;    //for horizontal and verticle lasers
         const bulletHeight = 30;
         //constants and vars for keys 
         const SPACEBAR = 32;
@@ -81,8 +84,12 @@
         var powerUpActive = false;
         const puWidth = 50;
         const puHeight = 50;
-        const GRAVITYSUITWIDTH = 50;
-        const GRAVITYSUITHEIGHT = 50;
+        var  gravitySuitHeight = 60;
+        var   gravitySuitWidth = 50;
+        var gravitySuitMaxSpeed = -12;
+        var gravitySuitAcceleration = -4;
+        var gravitySuitChangeSpeed = 4;
+        var gravityMaxSpeed = 12;
         //game over
         var gameOverScreen = new Image();
         var playerImg = new Image();
@@ -125,7 +132,6 @@
         } //endo of onload
         var gameStop = false;
         function mainloop() {
-            console.log()
             if (gameFinished == false) {
                 if (restartKeyPressed == true) {
                     startPos();
@@ -149,12 +155,12 @@
                 }
             }
         } //End of main loop;
-        function startPos() {
-            
+        function startPos() {  //set's all veriables based on canvas size and makes the game start or restart
+    
             if(difficulty.toLowerCase() == 'easy') {
-                lifes = 20;
+                lifes = 12;
             }    else if ( difficulty.toLowerCase() == 'normal') {
-                lifes = 10;
+                lifes = 7;
             }  else  if (difficulty.toLowerCase() == 'hard'){
                 lifes  =  3;
             }
@@ -164,7 +170,12 @@
             scientistKilled = 0;
             playerXpos = 160;
             score = 0;
-            floor = canvas.height - 50;
+            playerWidth = canvas.height / 10;
+            playerHeight = playerWidth * 1.666; 
+            ceiling = canvas.height * 0.103;
+            floor = canvas.height - ceiling;
+            laserMaxLength = canvas.height / 3;
+            laserMinLength = laserMaxLength / 7;
             playerYpos = floor - playerHeight;
             playerStartPos = floor - playerHeight;            
             for (var i = laserCount; i < laserMaxCount; i++) {
@@ -187,7 +198,6 @@
                 if (si.siXpos + siWidth <= 0) {
                    si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100); //deletes current xpos to reset on other side
                     lifes -= 1;
-                    console.log('testing')
                     if(lifes < 1 ) {
                         gameOver();
                     }
@@ -209,7 +219,7 @@
                 siYpos: siYpos,
                 siXspeed: siXspeed
             }
-            
+            siCount += 1;
             return newScientist; //returns new laser vars for new lasers   
         }
         function drawBullets() {
@@ -251,7 +261,7 @@
         }
         function randPowerUp() { // makes random power up
             var puXpos = canvas.width;
-            var puYpos = Math.floor(Math.random() * ((playerStartPos + playerHeight) - CEILING) + CEILING);
+            var puYpos = Math.floor(Math.random() * ((playerStartPos + playerHeight) - ceiling) + ceiling);
             var puXspeed = puXspeed;
             var newPowerUpObject = {
                 puXpos: puXpos, //need to change making not move
@@ -276,20 +286,22 @@
                 } else {
                     //must be touching
                     powerUpActive = true; // Activates gravity suit and changes apeal
-                    playerHeight = 60;
-                    playerWidth = 60;
-                    playerColor = 'blue'
-                    playerMaxSpeed = -12;
-                    playerAcceleration = -4;
-                    gravityChangeSpeed = 4;
-                    gravityMaxSpeed = 12;
+                    playerHeight = gravitySuitHeight;
+                    playerWidth =  gravitySuitWidth;
+                   
+                    powerUps = [];
+                    playerYspeed = gravityMaxSpeed;  
+                    playerMaxSpeed = gravitySuitMaxSpeed;
+                    playerAcceleration = gravitySuitAcceleration;
+                    gravityChangeSpeed = gravitySuitChangeSpeed;
+                    gravityMaxSpeed = gravityMaxSpeed;
                     playerImg.src = 'img/gravityGuyOnABikeUp.jpg'
                     var UP = true;
                 }
             });
         }
         function drawScore() {
-            canvasContext.font = "28px Arial";
+            canvasContext.font = "30px Indie Flower";
             canvasContext.fillStyle = "red";
             canvasContext.fillText("Score: " + score, 15, 30);
             canvasContext.fillText("Scientist Killed: " + scientistKilled, canvas.width / 2 + 30, 30)
@@ -310,11 +322,13 @@
             if (playerYpos == playerStartPos) { // if player on roof resets speed as not moving
                 playerYspeed = 0;
             }
-            if (playerYpos < CEILING) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
-                playerYpos = CEILING;
+            if (playerYpos < ceiling) { // resets player speed when on ground a makes sure playerr cant get below 50 ypos
+                playerYpos = ceiling;
                 playerYspeed = 0;
             }
             if (powerUpActive == false) {
+                playerStartPos = floor - playerHeight; //changes player starting pos for the height of player when doesn's have powerUp active
+                 
                 if (jumpKeyPressed == true) { //acceleration going up
                     if (playerYspeed > playerMaxSpeed) {
                         playerYspeed += playerAcceleration;
@@ -324,10 +338,11 @@
                         playerYspeed += gravityChangeSpeed; //acceleration going down
                     }
                 }
-                if (playerYpos <= playerStartPos && playerYpos >= CEILING) {
+                if (playerYpos <= playerStartPos && playerYpos >= ceiling) {
                     playerYpos += playerYspeed; //makes player move
                 }
             } else {
+                playerStartPos = floor - gravitySuitHeight;
                 if (up == true) { //diffirent movement for powerup changes grabity so ever going up or going down
                     if (playerYspeed < gravityMaxSpeed && playerYpos < playerStartPos) {
                         playerYspeed += gravityChangeSpeed; //acceleration going down
@@ -339,7 +354,7 @@
                     if (playerYspeed > playerMaxSpeed) {
                         playerYspeed += playerAcceleration;
                     }
-                    if (playerYpos <= playerStartPos && playerYpos >= CEILING) {
+                    if (playerYpos <= playerStartPos && playerYpos >= ceiling) {
                         playerYpos += playerYspeed; //makes player move
                     }
                 }
@@ -366,6 +381,7 @@
                     laser.laserXpos < playerXpos + playerWidth) {
                     if (powerUpActive == true) {
                         powerUpActive = false; // changes gravitysuit back to normal player
+                        
                         playerWidth = 70;
                         playerHeight = 70;
                         playerColor = 'green'
@@ -385,7 +401,7 @@
                     }
                     //checked if any of sides are not touching player
                 }
-            });
+            });   //end of laser move
             // old code for colission
             //            if (laser.laserXpos <= (playerXpos + playerWidth - 4) &&
             ////                    (laser.laserXpos + laser.laserWidth) >
@@ -398,6 +414,7 @@
             if (difficulty.toLowerCase() == 'easy') {
                 if (score <= 500) {
                     laserXspeed = -3;
+                    laserMaxCount = 1;
                 } else if (score <= 1000 && laserMaxCount < 2 && laserXspeed < -4) {    //changes difficulty of the laers
                     laserXspeed += -1;
                     laserMaxCount += 1;
@@ -410,6 +427,7 @@
                 }
             } else if (difficulty.toLowerCase() == 'normal') { //<------ is to change the difficutlty overtime
                 if (score <= 500) {
+                    laserMaxCount = 1;
                     laserXspeed = -3;
                 } else if (score <= 1000 && laserMaxCount < 2) {
                     laserXspeed += -2;
@@ -422,9 +440,9 @@
                     laserXspeed += -0.2;
                 }
             } else if (difficulty.toLowerCase() == 'hard') {
-                if (score <= 500 && laserMaxCount < 2) {
+                if (score <= 500 ) {
                     laserXspeed = -7;
-                    laserMaxCount += 1;
+                    laserMaxCount = 2;
                 } else if (score <= 1000 && laserMaxCount < 3) {
                     laserXspeed += -2;
                     laserMaxCount += 1;
@@ -449,15 +467,15 @@
                 var laserShape = 2; // 2 is verticle
             }
             if (laserShape == 1) {
-                var laserWidth = 200;
-                var laserHeight = 30;
+                var laserWidth = laserMaxLength;
+                var laserHeight = laserMinLength;
             } else {
-                var laserWidth = 30;
-                var laserHeight = 200;
+                var laserWidth = laserMinLength;
+                var laserHeight = laserMaxLength;
             }
-            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap) + minGap) //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later         
+            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap) + minGap) + canvas.width /2 //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later    also makes them far apart when new laser is first added     
             //max  -  min       + min
-            var laserYpos = Math.floor(Math.random() * (floor - laserHeight - CEILING) + CEILING);
+            var laserYpos = Math.floor(Math.random() * (floor - laserHeight - ceiling) + ceiling);
             var newLaserObject = {
                 laserWidth: laserWidth,
                 laserXpos: laserXpos, //need to change making not move
@@ -467,7 +485,24 @@
             }
             laserCount += 1;
             return newLaserObject; //returns new laser vars for new lasers
+        }    //end of randLaser
+        
+        function reset() {  //resets lasers and scientists
+            lasers.forEach(function(laser,index,array) {
+                
+                lasers = [];
+                laserCount = 0;
+                
+                for(i=laserCount; i < laserMaxCount; i++) {
+                    lasers.push(randLaser());
+                }
+            });
+            
+            scientist.forEach(function(si,index,array) {
+                    si.siXpos =  canvas.width + Math.floor(Math.random() * (500) + 100);
+            });
         }
+        
         function drawPlayer() { // to draw player
             drawImg(playerImg, playerXpos, playerYpos, playerWidth, playerHeight);
         }
@@ -481,6 +516,7 @@
             }
             if (evt.keyCode == RKEY) {
                 restartKeyPressed = true;
+                reset();
             }
         }
         function keyReleased(evt) { //check for keys released
@@ -523,7 +559,7 @@
     </script>
 
     <h2> 
-    Press R key to Restart
+    Press R key twice to Restart
     </h2>
 
 </body>

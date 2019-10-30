@@ -20,12 +20,10 @@
             display: block;
             width: 800px;
         }
-
         h2 {
             color: red;
             font-size: 50px;
         }
-
     </style>
     <script>
         var canvas, canvasContext;
@@ -100,13 +98,13 @@
         var laserImg = new Image();
         var bulletImg = new Image();
         var puImg = new Image();
-        puImg.src = 'img/powerUpBlock.jpg'
-        bulletImg.src = 'img/bullet.png'
-        laserImg.src = 'img/laser.png'
-        gameOverScreen.src = 'img/GameOver.jpg'
-        playerImg.src = 'img/player2.png'
-        siImg.src = 'img/siSkin1.jpg'
-        bg.src = 'img/background.jpg'
+        puImg.src = 'img/powerUpBlock.jpg';
+        bulletImg.src = 'img/bullet.png';
+        laserImg.src = 'img/laser.png';
+        gameOverScreen.src = 'img/GameOver.jpg';
+        playerImg.src = 'img/player2.png';
+        siImg.src = 'img/siSkin1.jpg';
+        bg.src = 'img/background.jpg';
         var gameFinished = false; //prompts to ask difficulty and name
         var name = prompt("What's your name")
         while (name.length == 0 || name == 'null') {
@@ -135,7 +133,6 @@
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
         var gameStop = false;
-
         function mainloop() {
             if (gameFinished == false) {
                 if (restartKeyPressed == true) {
@@ -163,7 +160,6 @@
         } //End of main loop;
         function startPos() { //set's all veriables based on canvas size and makes the game start or restart
             laserXspeed = -3;
-
             if (difficulty.toLowerCase() == 'easy') {
                 lifes = 12;
             } else if (difficulty.toLowerCase() == 'normal') {
@@ -171,7 +167,7 @@
             } else if (difficulty.toLowerCase() == 'hard') {
                 lifes = 3;
             }
-            laserCount = 0;
+            
             
             playerYspeed = 0;
             playerMaxSpeed = -8;
@@ -180,7 +176,7 @@
             gravityChangeSpeed = 0.5;
             gravityMaxSpeed = 9;
             up = true;
-            playerImg.src = 'img/player2.png'
+            playerImg.src = 'img/player2.png';
             gameFinished = false;
             scientistKilled = 0;
             playerXpos = canvas.width / 3;
@@ -197,21 +193,18 @@
             for (var i = laserCount; i < laserMaxCount; i++) {
                 lasers.push(randLaser());
             }
+            
             for (var i = siCount; i < siMaxCount; i++) {
                 scientist.push(addScientist());
             }
-
         } 
-
         function drawScientist() { // draws the scientist
             scientist.forEach(function(si, index, array) {
                 drawImg(siImg, si.siXpos, si.siYpos, siWidth, siHeight);
             });
         }
-
         function scientistMove() {
             scientist.forEach(function(si, index, array) {
-
                 si.siXpos += si.siXspeed;
                 if (si.siXpos + siWidth <= 0) {
                     si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100); //deletes current xpos to reset on other side
@@ -220,10 +213,8 @@
                         gameOver();
                     }
                 }
-
             });
         }
-
         function addScientist() { //adds new scientist
             var siXpos = canvas.width + Math.floor(Math.random() * (500) + 100);
             var siYpos = floor - 50;
@@ -241,13 +232,11 @@
             siCount += 1;
             return newScientist; //returns new laser vars for new lasers   
         }
-
         function drawBullets() {
             bullets.forEach(function(bullet, index, array) {
                 drawImg(bulletImg, bullet.bulletXpos, bullet.bulletYpos, bulletWidth, bulletHeight)
             });
         }
-
         function addBullet() {
             var bulletSpeed = 10;
             var bulletYpos = playerYpos + 50;
@@ -260,7 +249,6 @@
             bulletCount += 1;
             return newBulletObject;
         }
-
         function bulletMove() {
             bullets.forEach(function(bullet, index, array) {
                 bullet.bulletXpos += bullet.bulletSpeed;
@@ -281,7 +269,6 @@
                 });
             });
         }
-
         function randPowerUp() { // makes random power up
             var puXpos = canvas.width;
             var puYpos = Math.floor(Math.random() * ((playerStartPos + playerHeight) - ceiling) + ceiling);
@@ -293,13 +280,11 @@
             }
             return newPowerUpObject; //end of rand power up
         }
-
         function drawPowerUp() { // draws the lasers
             powerUps.forEach(function(powerUP, index, array) {
                 drawImg(puImg, powerUP.puXpos, powerUP.puYpos, puWidth, puHeight)
             });
         }
-
         function powerUpMove() {
             powerUps.forEach(function(powerUp, index, array) {
                 powerUp.puXpos += laserXspeed;
@@ -324,14 +309,12 @@
                 }
             });
         }
-
         function drawScore() {
             canvasContext.font = "30px Indie Flower";
             canvasContext.fillStyle = "red";
             canvasContext.fillText("Score: " + score, 15, 30);
             canvasContext.fillText("Scientist Killed: " + scientistKilled, canvas.width / 2 + 30, 30);
             canvasContext.fillText("lifes: " + lifes, canvas.width / 3, 30);
-
             if (gameFinished == false) {
                 score += 1;
             }
@@ -341,7 +324,6 @@
                 }
             }
         }
-
         function playerMove() { //makes player move when space pressed
             if (playerYpos > playerStartPos) { // so player keeps going to right spot if gos below after delay
                 playerYpos = playerStartPos;
@@ -355,7 +337,6 @@
             }
             if (powerUpActive == false) {
                 playerStartPos = floor - playerHeight; //changes player starting pos for the height of player when doesn's have powerUp active
-
                 if (jumpKeyPressed == true) { //acceleration going up
                     if (playerYspeed > playerMaxSpeed) {
                         playerYspeed += playerAcceleration;
@@ -392,7 +373,6 @@
                 drawImg(laserImg, laser.laserXpos, laser.laserYpos, laser.laserWidth, laser.laserHeight);
             });
         }
-
         function laserMove() {
             lasers.forEach(function(laser, index, array) {
                 laser.laserXpos += laserXspeed;
@@ -409,7 +389,6 @@
                     laser.laserXpos < playerXpos + playerWidth) {
                     if (powerUpActive == true) {
                         powerUpActive = false; // changes gravitysuit back to normal player
-
                         playerWidth = 70;
                         playerHeight = 70;
                         playerYspeed = 0;
@@ -484,8 +463,8 @@
                 }
             }
             if (score <= 500) { // changes gap for lasers the higher the score so not big gaps with no laser at the begining
-                maxGap = 0;
-                minGap = 0;
+                maxGap = 100;
+                minGap = 80;
             } else {
                 maxGap = 500;
                 minGap = 200;
@@ -498,11 +477,9 @@
             if (laserShape == 1) {
                 var laserWidth = laserMaxLength;
                 var laserHeight = laserMinLength;
-                laserImg.src = 'img/laser.png';
             } else {
                 var laserWidth = laserMinLength;
                 var laserHeight = laserMaxLength;
-                 laserImg.src = 'img/laser.png';
             }
             var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap) + minGap) + canvas.width / 2 //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later    also makes them far apart when new laser is first added     
             //max  -  min       + min
@@ -517,27 +494,21 @@
             laserCount += 1;
             return newLaserObject; //returns new laser vars for new lasers
         } //end of randLaser
-
         function reset() { //resets lasers and scientists
             lasers.forEach(function(laser, index, array) {
-
                 lasers = [];
                 laserCount = 0;
-
                 for (i = laserCount; i < laserMaxCount; i++) {
                     lasers.push(randLaser());
                 }
             });
-
             scientist.forEach(function(si, index, array) {
                 si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100);
             });
         }
-
         function drawPlayer() { // to draw player
             drawImg(playerImg, playerXpos, playerYpos, playerWidth, playerHeight);
         }
-
         function keyPressed(evt) { //checks for keys pressed
             if (evt.keyCode == WKEY || evt.keyCode == UPARROW) {
                 jumpKeyPressed = true;
@@ -551,7 +522,6 @@
                 reset();
             }
         }
-
         function keyReleased(evt) { //check for keys released
             if (evt.keyCode == SPACEBAR) {
                 spaceBarPressed = false;
@@ -576,16 +546,13 @@
                 //                console.log('released')
             }
         }
-
         function colorRect(x, y, w, h, c) { // to draw things parameters are xpos ,ypos ,width ,height and ,color.
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
-
         function drawImg(src, x, y, w, h) {
             canvasContext.drawImage(src, x, y, w, h);
         }
-
         function gameOver() {
             gameFinished = true;
             drawScore();
@@ -594,18 +561,18 @@
             canvasContext.fillText('You killed ' + scientistKilled + ' evil scientists', 30, canvas.height - 14);
             canvasContext.fillText('You killed ' + scientistKilled + ' evil scientists', 30, canvas.height - 14);
             
-            
+        
             scientist.forEach(function(si, index, array) {
-                si.siXpos += 314;
+                si.siXpos += -1000;
             });
             powerUps.forEach(function(pu, index, array) {
-                pu.puXpos += 314;
+                pu.puXpos += -1000;
             });
         }
     </script>
 
     <h2>
-        Press R key twice to Restart
+        Press R key  to Restart
     </h2>
 
 </body>

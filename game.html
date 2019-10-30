@@ -20,10 +20,12 @@
             display: block;
             width: 800px;
         }
+
         h2 {
             color: red;
             font-size: 50px;
         }
+
     </style>
     <script>
         var canvas, canvasContext;
@@ -65,7 +67,7 @@
         var bullets = [];
         var bulletCount = 0;
         var bulletMaxCount = 4;
-        const bulletWidth = 30;    //for horizontal and verticle lasers
+        const bulletWidth = 30; //for horizontal and verticle lasers
         const bulletHeight = 30;
         //constants and vars for keys 
         const SPACEBAR = 32;
@@ -84,8 +86,8 @@
         var powerUpActive = false;
         const puWidth = 50;
         const puHeight = 50;
-        var  gravitySuitHeight = 60;
-        var   gravitySuitWidth = 50;
+        var gravitySuitHeight = 60;
+        var gravitySuitWidth = 50;
         var gravitySuitMaxSpeed = -12;
         var gravitySuitAcceleration = -4;
         var gravitySuitChangeSpeed = 4;
@@ -96,7 +98,9 @@
         var siImg = new Image();
         var bg = new Image();
         var laserImg = new Image();
-        var bulletImg = new Image(); 
+        var bulletImg = new Image();
+        var puImg = new Image();
+        puImg.src = 'img/powerUpBlock.jpg'
         bulletImg.src = 'img/bullet.png'
         laserImg.src = 'img/laser.png'
         gameOverScreen.src = 'img/GameOver.jpg'
@@ -131,11 +135,13 @@
             document.addEventListener('keyup', keyReleased);
         } //endo of onload
         var gameStop = false;
+
         function mainloop() {
             if (gameFinished == false) {
                 if (restartKeyPressed == true) {
                     startPos();
                 }
+    
                 colorRect(0, 0, canvas.width, canvas.height, 'black');
                 drawImg(bg, 0, 0, canvas.width, canvas.height);
                 drawPlayer();
@@ -155,56 +161,69 @@
                 }
             }
         } //End of main loop;
-        function startPos() {  //set's all veriables based on canvas size and makes the game start or restart
-    
-            if(difficulty.toLowerCase() == 'easy') {
+        function startPos() { //set's all veriables based on canvas size and makes the game start or restart
+            laserXspeed = -3;
+
+            if (difficulty.toLowerCase() == 'easy') {
                 lifes = 12;
-            }    else if ( difficulty.toLowerCase() == 'normal') {
+            } else if (difficulty.toLowerCase() == 'normal') {
                 lifes = 7;
-            }  else  if (difficulty.toLowerCase() == 'hard'){
-                lifes  =  3;
+            } else if (difficulty.toLowerCase() == 'hard') {
+                lifes = 3;
             }
+            laserCount = 0;
             
-            
+            playerYspeed = 0;
+            playerMaxSpeed = -8;
+            playerAcceleration = -0.5;
+                        // grabity vars and const
+            gravityChangeSpeed = 0.5;
+            gravityMaxSpeed = 9;
+            up = true;
+            playerImg.src = 'img/player2.png'
             gameFinished = false;
             scientistKilled = 0;
-            playerXpos = 160;
+            playerXpos = canvas.width / 3;
             score = 0;
+            powerUpActive = false;
             playerWidth = canvas.height / 10;
-            playerHeight = playerWidth * 1.666; 
+            playerHeight = playerWidth * 1.666;
             ceiling = canvas.height * 0.103;
             floor = canvas.height - ceiling;
             laserMaxLength = canvas.height / 3;
             laserMinLength = laserMaxLength / 7;
             playerYpos = floor - playerHeight;
-            playerStartPos = floor - playerHeight;            
+            playerStartPos = floor - playerHeight;
             for (var i = laserCount; i < laserMaxCount; i++) {
                 lasers.push(randLaser());
             }
             for (var i = siCount; i < siMaxCount; i++) {
                 scientist.push(addScientist());
             }
-            
-        }
+
+        } 
+
         function drawScientist() { // draws the scientist
             scientist.forEach(function(si, index, array) {
                 drawImg(siImg, si.siXpos, si.siYpos, siWidth, siHeight);
             });
         }
+
         function scientistMove() {
             scientist.forEach(function(si, index, array) {
-                
+
                 si.siXpos += si.siXspeed;
                 if (si.siXpos + siWidth <= 0) {
-                   si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100); //deletes current xpos to reset on other side
+                    si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100); //deletes current xpos to reset on other side
                     lifes -= 1;
-                    if(lifes < 1 ) {
+                    if (lifes < 1) {
                         gameOver();
                     }
                 }
-               
+
             });
         }
+
         function addScientist() { //adds new scientist
             var siXpos = canvas.width + Math.floor(Math.random() * (500) + 100);
             var siYpos = floor - 50;
@@ -222,11 +241,13 @@
             siCount += 1;
             return newScientist; //returns new laser vars for new lasers   
         }
+
         function drawBullets() {
             bullets.forEach(function(bullet, index, array) {
                 drawImg(bulletImg, bullet.bulletXpos, bullet.bulletYpos, bulletWidth, bulletHeight)
             });
         }
+
         function addBullet() {
             var bulletSpeed = 10;
             var bulletYpos = playerYpos + 50;
@@ -239,26 +260,28 @@
             bulletCount += 1;
             return newBulletObject;
         }
+
         function bulletMove() {
             bullets.forEach(function(bullet, index, array) {
                 bullet.bulletXpos += bullet.bulletSpeed;
                 if (bullet.bulletXpos > canvas.width) {
-                    delete  bullet.bulletXpos;
+                    delete bullet.bulletXpos;
                     bulletCount -= 1;
                 }
                 scientist.forEach(function(si, index, array) { // to check if any bullets are touching any scientist
                     if (bullet.bulletXpos < si.siXpos + siWidth &&
                         bullet.bulletXpos + bulletWidth > si.siXpos &&
                         bullet.bulletYpos < si.siYpos + siHeight &&
-                        bullet.bulletYpos +bulletHeight >= si.siYpos &&
+                        bullet.bulletYpos + bulletHeight >= si.siYpos &&
                         si.siXpos < canvas.width) {
                         delete si.siXpos;
-                        siXpos = si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100); 
+                        siXpos = si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100);
                         scientistKilled += 1;
                     }
                 });
             });
         }
+
         function randPowerUp() { // makes random power up
             var puXpos = canvas.width;
             var puYpos = Math.floor(Math.random() * ((playerStartPos + playerHeight) - ceiling) + ceiling);
@@ -270,15 +293,17 @@
             }
             return newPowerUpObject; //end of rand power up
         }
+
         function drawPowerUp() { // draws the lasers
             powerUps.forEach(function(powerUP, index, array) {
-                colorRect(powerUP.puXpos, powerUP.puYpos, puWidth,puHeight, 'blue');
+                drawImg(puImg, powerUP.puXpos, powerUP.puYpos, puWidth, puHeight)
             });
         }
+
         function powerUpMove() {
             powerUps.forEach(function(powerUp, index, array) {
                 powerUp.puXpos += laserXspeed;
-                if (powerUp.puYpos + puHeight < playerYpos || 
+                if (powerUp.puYpos + puHeight < playerYpos ||
                     powerUp.puYpos > playerYpos + playerHeight ||
                     powerUp.puXpos + puWidth < playerXpos ||
                     powerUp.puXpos > playerXpos + playerWidth) {
@@ -286,26 +311,27 @@
                 } else {
                     //must be touching
                     powerUpActive = true; // Activates gravity suit and changes apeal
+                    up = true;
                     playerHeight = gravitySuitHeight;
-                    playerWidth =  gravitySuitWidth;
-                   
-                    powerUps = [];
-                    playerYspeed = gravityMaxSpeed;  
+                    playerWidth = gravitySuitWidth;
+                    powerUps = []; //clears the powerUP array
+                    playerYspeed = gravityMaxSpeed;
                     playerMaxSpeed = gravitySuitMaxSpeed;
                     playerAcceleration = gravitySuitAcceleration;
                     gravityChangeSpeed = gravitySuitChangeSpeed;
-                    gravityMaxSpeed = gravityMaxSpeed;
                     playerImg.src = 'img/gravityGuyOnABikeUp.jpg'
                     var UP = true;
                 }
             });
         }
+
         function drawScore() {
             canvasContext.font = "30px Indie Flower";
             canvasContext.fillStyle = "red";
             canvasContext.fillText("Score: " + score, 15, 30);
-            canvasContext.fillText("Scientist Killed: " + scientistKilled, canvas.width / 2 + 30, 30)
+            canvasContext.fillText("Scientist Killed: " + scientistKilled, canvas.width / 2 + 30, 30);
             canvasContext.fillText("lifes: " + lifes, canvas.width / 3, 30);
+
             if (gameFinished == false) {
                 score += 1;
             }
@@ -315,6 +341,7 @@
                 }
             }
         }
+
         function playerMove() { //makes player move when space pressed
             if (playerYpos > playerStartPos) { // so player keeps going to right spot if gos below after delay
                 playerYpos = playerStartPos;
@@ -328,7 +355,7 @@
             }
             if (powerUpActive == false) {
                 playerStartPos = floor - playerHeight; //changes player starting pos for the height of player when doesn's have powerUp active
-                 
+
                 if (jumpKeyPressed == true) { //acceleration going up
                     if (playerYspeed > playerMaxSpeed) {
                         playerYspeed += playerAcceleration;
@@ -362,9 +389,10 @@
         } //end of playerMove function
         function drawLasers() { // draws the lasers
             lasers.forEach(function(laser, index, array) {
-                drawImg(laserImg,laser.laserXpos, laser.laserYpos, laser.laserWidth, laser.laserHeight);
+                drawImg(laserImg, laser.laserXpos, laser.laserYpos, laser.laserWidth, laser.laserHeight);
             });
         }
+
         function laserMove() {
             lasers.forEach(function(laser, index, array) {
                 laser.laserXpos += laserXspeed;
@@ -381,11 +409,10 @@
                     laser.laserXpos < playerXpos + playerWidth) {
                     if (powerUpActive == true) {
                         powerUpActive = false; // changes gravitysuit back to normal player
-                        
+
                         playerWidth = 70;
                         playerHeight = 70;
-                        playerColor = 'green'
-                        var playerYspeed = 0;
+                        playerYspeed = 0;
                         playerMaxSpeed = -8;
                         playerAcceleration = -0.5;
                         // grabity vars and const
@@ -396,12 +423,14 @@
                         delete laser.laserXpos;
                         laserCount -= 1;
                         laser.laserXpos += 200;
+                        playerWidth = canvas.height / 10;
+                        playerHeight = playerWidth * 1.666;
                     } else { //bugged
                         gameOver();
                     }
                     //checked if any of sides are not touching player
                 }
-            });   //end of laser move
+            }); //end of laser move
             // old code for colission
             //            if (laser.laserXpos <= (playerXpos + playerWidth - 4) &&
             ////                    (laser.laserXpos + laser.laserWidth) >
@@ -415,7 +444,7 @@
                 if (score <= 500) {
                     laserXspeed = -3;
                     laserMaxCount = 1;
-                } else if (score <= 1000 && laserMaxCount < 2 && laserXspeed < -4) {    //changes difficulty of the laers
+                } else if (score <= 1000 && laserMaxCount < 2 && laserXspeed < -4) { //changes difficulty of the laers
                     laserXspeed += -1;
                     laserMaxCount += 1;
                 } else if (score <= 1500 && laserXspeed < -6) {
@@ -430,21 +459,21 @@
                     laserMaxCount = 1;
                     laserXspeed = -3;
                 } else if (score <= 1000 && laserMaxCount < 2) {
-                    laserXspeed += -2;
+                    laserXspeed += -1.8;
                     laserMaxCount += 1;
                 } else if (score <= 1500 && laserXspeed < -8) {
-                    laserXspeed += -0.5;
+                    laserXspeed += -0.7;
                 } else if (score <= 1500 && laserXspeed < -12) {
                     laserXspeed += -0.5;
                 } else {
                     laserXspeed += -0.2;
                 }
             } else if (difficulty.toLowerCase() == 'hard') {
-                if (score <= 500 ) {
-                    laserXspeed = -7;
+                if (score <= 500) {
+                    laserXspeed = -3;
                     laserMaxCount = 2;
                 } else if (score <= 1000 && laserMaxCount < 3) {
-                    laserXspeed += -2;
+                    laserXspeed += -3;
                     laserMaxCount += 1;
                 } else if (score <= 1500 && laserXspeed < -9) {
                     laserXspeed += -0.5;
@@ -454,13 +483,13 @@
                     laserXspeed += -0.1;
                 }
             }
-            if (score <= 500) {    // changes gap for lasers the higher the score so not big gaps with no laser at the begining
+            if (score <= 500) { // changes gap for lasers the higher the score so not big gaps with no laser at the begining
                 maxGap = 0;
                 minGap = 0;
-            } else  {
+            } else {
                 maxGap = 500;
                 minGap = 200;
-            } 
+            }
             if (Math.random() < 0.5) {
                 var laserShape = 1; // 1 is horizontal
             } else {
@@ -469,11 +498,13 @@
             if (laserShape == 1) {
                 var laserWidth = laserMaxLength;
                 var laserHeight = laserMinLength;
+                laserImg.src = 'img/laser.png';
             } else {
                 var laserWidth = laserMinLength;
                 var laserHeight = laserMaxLength;
+                 laserImg.src = 'img/laser.png';
             }
-            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap) + minGap) + canvas.width /2 //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later    also makes them far apart when new laser is first added     
+            var laserXpos = canvas.width + Math.floor(Math.random() * (maxGap - minGap) + minGap) + canvas.width / 2 //makes lasers spawn on left of canvas random gap spawning out of the page ;  //make out side right of page later    also makes them far apart when new laser is first added     
             //max  -  min       + min
             var laserYpos = Math.floor(Math.random() * (floor - laserHeight - ceiling) + ceiling);
             var newLaserObject = {
@@ -485,27 +516,28 @@
             }
             laserCount += 1;
             return newLaserObject; //returns new laser vars for new lasers
-        }    //end of randLaser
-        
-        function reset() {  //resets lasers and scientists
-            lasers.forEach(function(laser,index,array) {
-                
+        } //end of randLaser
+
+        function reset() { //resets lasers and scientists
+            lasers.forEach(function(laser, index, array) {
+
                 lasers = [];
                 laserCount = 0;
-                
-                for(i=laserCount; i < laserMaxCount; i++) {
+
+                for (i = laserCount; i < laserMaxCount; i++) {
                     lasers.push(randLaser());
                 }
             });
-            
-            scientist.forEach(function(si,index,array) {
-                    si.siXpos =  canvas.width + Math.floor(Math.random() * (500) + 100);
+
+            scientist.forEach(function(si, index, array) {
+                si.siXpos = canvas.width + Math.floor(Math.random() * (500) + 100);
             });
         }
-        
+
         function drawPlayer() { // to draw player
             drawImg(playerImg, playerXpos, playerYpos, playerWidth, playerHeight);
         }
+
         function keyPressed(evt) { //checks for keys pressed
             if (evt.keyCode == WKEY || evt.keyCode == UPARROW) {
                 jumpKeyPressed = true;
@@ -519,6 +551,7 @@
                 reset();
             }
         }
+
         function keyReleased(evt) { //check for keys released
             if (evt.keyCode == SPACEBAR) {
                 spaceBarPressed = false;
@@ -543,23 +576,36 @@
                 //                console.log('released')
             }
         }
+
         function colorRect(x, y, w, h, c) { // to draw things parameters are xpos ,ypos ,width ,height and ,color.
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
         }
+
         function drawImg(src, x, y, w, h) {
             canvasContext.drawImage(src, x, y, w, h);
         }
+
         function gameOver() {
             gameFinished = true;
             drawScore();
-            delete lasers;
             drawImg(gameOverScreen, 0, 0, canvas.width, canvas.height);
+            canvasContext.fillText(name + ' your score was ' + score, 30, canvas.height - 40)
+            canvasContext.fillText('You killed ' + scientistKilled + ' evil scientists', 30, canvas.height - 14);
+            canvasContext.fillText('You killed ' + scientistKilled + ' evil scientists', 30, canvas.height - 14);
+            
+            
+            scientist.forEach(function(si, index, array) {
+                si.siXpos += 314;
+            });
+            powerUps.forEach(function(pu, index, array) {
+                pu.puXpos += 314;
+            });
         }
     </script>
 
-    <h2> 
-    Press R key twice to Restart
+    <h2>
+        Press R key twice to Restart
     </h2>
 
 </body>

@@ -90,6 +90,7 @@
         var gravitySuitAcceleration = -4;
         var gravitySuitChangeSpeed = 4;
         var gravityMaxSpeed = 12;
+        var highScore = '';
         //game over
         var gameOverScreen = new Image();
         var playerImg = new Image();
@@ -573,14 +574,18 @@
             canvasContext.drawImage(src, x, y, w, h);
         }
         function gameOver() {
+            
+            if (score > highScore) {
+                highScore = score;
+            } 
+            
             gameFinished = true;
             drawScore();
             drawImg(gameOverScreen, 0, 0, canvas.width, canvas.height);
             canvasContext.fillText(name + ' your score was ' + score, 30, canvas.height - 40)
             canvasContext.fillText('You killed ' + scientistKilled + ' evil scientists', 30, canvas.height - 14);
-            canvasContext.fillText('You killed ' + scientistKilled + ' evil scientists', 30, canvas.height - 14);
             
-        
+            
             scientist.forEach(function(si, index, array) {
                 si.siXpos += -1000;
             });
